@@ -60,15 +60,10 @@ namespace DuhnieLogo.Core.Tokens
                     reader.ReadCharacter();
                     tokens.Add(new Token() { Type = TokenType.DoubleQuote, Value = "\"" });
                 }
-                else if (character == '{')
+                else if (character == ':')
                 {
                     reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Begin, Value = "{" });
-                }
-                else if (character == '}')
-                {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.End, Value = "}" });
+                    tokens.Add(new Token() { Type = TokenType.Colon, Value = ":" });
                 }
                 else if (character == ';')
                 {
@@ -116,11 +111,6 @@ namespace DuhnieLogo.Core.Tokens
                     reader.ReadCharacter();
                     tokens.Add(new Token() { Type = TokenType.Comma, Value = "," });
                 }
-                else if (character == '\n')
-                {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.NewLine, Value = "\n" });
-                }
                 else if (Char.IsLetter(character))
                 {
                     tokens.Add(ParseKeywordOrIdentifier(reader));
@@ -133,7 +123,7 @@ namespace DuhnieLogo.Core.Tokens
                 {
                     tokens.Add(ParseStringLiteral(reader));
                 }
-                else if (Char.IsWhiteSpace(character) || character == '\r')
+                else if (Char.IsWhiteSpace(character) || character == '\n' || character == '\r')
                 {
                     // Skip
                     reader.ReadCharacter();
@@ -169,20 +159,11 @@ namespace DuhnieLogo.Core.Tokens
                     if (value == "maak" || value == "naam")
                         return new Token() { Type = TokenType.Make, Value = value };
 
-                    if (value == "if")
-                        return new Token() { Type = TokenType.If, Value = value };
+                    if (value == "leer")
+                        return new Token() { Type = TokenType.Learn, Value = value };
 
-                    if (value == "else")
-                        return new Token() { Type = TokenType.Else, Value = value };
-
-                    if (value == "var")
-                        return new Token() { Type = TokenType.Var, Value = value };
-
-                    if (value == "procedure")
-                        return new Token() { Type = TokenType.Procedure, Value = value };
-
-                    if (value == "return")
-                        return new Token() { Type = TokenType.Return, Value = value };
+                    if (value == "eind")
+                        return new Token() { Type = TokenType.End, Value = value };
 
                     return new Token()
                     {

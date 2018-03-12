@@ -13,9 +13,14 @@ namespace DuhnieLogo.Core.Interpreter
         private readonly TokenStream tokens;
         private Dictionary<string, object> memory = new Dictionary<string, object>();
 
+        private Dictionary<string, ProcedureInfo> procedures = new Dictionary<string, ProcedureInfo>();
+        private Stack<int> locationStack = new Stack<int>();
+
         public Interpreter(Token[] tokens)
         {
             this.tokens = new TokenStream(tokens);
+
+            procedures.Add("Print", new BuiltInProcedure() { Name = "Print" });
         }
 
         public object Interpret()
@@ -29,7 +34,6 @@ namespace DuhnieLogo.Core.Interpreter
             while(tokens.CurrentToken.Type != TokenType.ProgramEnd)
             {
                 result = Statement();
-                tokens.Eat(TokenType.NewLine);
             }
 
             return result;
@@ -39,8 +43,30 @@ namespace DuhnieLogo.Core.Interpreter
         {
             if (tokens.CurrentToken.Type == TokenType.Make)
                 return VariableDefinition();
+            else if (tokens.CurrentToken.Type == TokenType.Learn)
+            {
+                ProcedureDeclaration();
+                return null;
+            }
             else
                 return Expression();
+        }
+
+        private void ProcedureDeclaration()
+        {
+            var procedureInfo = new CustomProcedureInfo();
+
+            tokens.Eat(TokenType.Learn);
+            
+            procedureInfo.Name = tokens.Eat(TokenType.Word).Value;
+            procedureInfo.Location = tokens.Location;
+
+            while (tokens.CurrentToken.Type != TokenType.End)
+                tokens.Eat();
+
+            tokens.Eat(TokenType.End);
+
+            procedures[procedureInfo.Name] = procedureInfo;
         }
 
         private object VariableDefinition()
@@ -65,10 +91,44 @@ namespace DuhnieLogo.Core.Interpreter
         {
             if (node is IntegerNode)
                 return ((IntegerNode)node).Value;
+            if (node is VariableNode)
+                return memory[((VariableNode)node).Name];
+            if (node is ProcedureCallNode)
+                return InterpretProcedureCall(node as ProcedureCallNode);
             if (node is BinaryOperatorNode)
                 return InterpretBinaryOperator(node as BinaryOperatorNode);
 
             throw new Exception($"Unknown node: {node}");
+        }
+
+        private object InterpretProcedureCall(ProcedureCallNode node)
+        {
+            var procedure = procedures[node.Name];
+
+            if (procedure is CustomProcedureInfo)
+            {
+                var customProcedure = procedure as CustomProcedureInfo;
+                locationStack.Push(tokens.Location);
+
+                tokens.Seek(customProcedure.Location);
+                object result = null;
+
+                while (tokens.CurrentToken.Type != TokenType.End)
+                    result = Statement();
+
+                tokens.Eat(TokenType.End);
+
+                tokens.Seek(locationStack.Pop());
+                return result;
+            }
+            else if(procedure is BuiltInProcedure)
+            {
+                var builtInProcedure = procedure as BuiltInProcedure;
+
+                return null;
+            }
+
+            throw new Exception($"Unknown procedure type {procedure}");
         }
 
         private object InterpretBinaryOperator(BinaryOperatorNode binaryOperatorNode)
@@ -138,6 +198,19 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var token = tokens.Eat(TokenType.Integer);
                 return new IntegerNode { Value = Convert.ToInt32(token.Value) };
+            }
+            else if (tokens.CurrentToken.Type == TokenType.Colon)
+            {
+                tokens.Eat(TokenType.Colon);
+                var variableName = tokens.Eat(TokenType.Word).Value;
+                
+                return new VariableNode { Name = variableName };
+            }
+            else if (tokens.CurrentToken.Type == TokenType.Word)
+            {
+                var name = tokens.Eat(TokenType.Word).Value;
+
+                return new ProcedureCallNode { Name = name };
             }
 
             throw new Exception($"Unexpected token {tokens.CurrentToken}");

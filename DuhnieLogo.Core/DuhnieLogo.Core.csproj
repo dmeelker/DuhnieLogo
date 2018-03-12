@@ -43,7 +43,12 @@
     <Compile Include="Interpreter\Ast\BinaryOperatorNode.cs" />
     <Compile Include="Interpreter\Ast\IntegerNode.cs" />
     <Compile Include="Interpreter\Ast\Node.cs" />
+    <Compile Include="Interpreter\Ast\ProcedureCallNode.cs" />
+    <Compile Include="Interpreter\Ast\VariableNode.cs" />
+    <Compile Include="Interpreter\BuiltInProcedure.cs" />
     <Compile Include="Interpreter\Interpreter.cs" />
+    <Compile Include="Interpreter\CustomProcedureInfo.cs" />
+    <Compile Include="Interpreter\ProcedureInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tokens\CharacterReader.cs" />
     <Compile Include="Tokens\Keywords.cs" />

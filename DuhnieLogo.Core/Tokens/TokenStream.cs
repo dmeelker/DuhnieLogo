@@ -35,10 +35,10 @@ namespace DuhnieLogo.Core.Tokens
 
         public Token CurrentToken => currentIndex < tokens.Length ? tokens[currentIndex] : null;
 
-        public Token Eat(TokenType type)
+        public Token Eat(TokenType? type = null)
         {
             var token = CurrentToken;
-            if (token.Type != type)
+            if (type != null && token.Type != type)
                 throw new Exception($"Unexpected token: {token}, expected {type}");
 
             currentIndex++;

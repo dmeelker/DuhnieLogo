@@ -12,10 +12,17 @@ namespace DuhnieLogo
     {
         static void Main(string[] args)
         {
-            var input = @"maak ""test (10 + 5) * 2
-maak ""aap 1
-10 + 1
-";
+            var input = @"
+                leer Geef10
+                    Print
+                    10
+                eind
+
+                leer Plus5
+                    Geef10 + 5
+                eind
+
+                10 + Plus5";
 
             var tokens = Lexer.Tokenize(input);
 

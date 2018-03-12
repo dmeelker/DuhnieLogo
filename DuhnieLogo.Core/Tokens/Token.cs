@@ -41,12 +41,12 @@ namespace DuhnieLogo.Core.Tokens
         ParenthesisLeft,
         ParenthesisRight,
 
+        Colon,
         Semicolon,
         Assign,
-        Begin,
-        End,
 
-        Procedure,
+        Learn,
+        End,
         Return,
         ProgramEnd,
 
