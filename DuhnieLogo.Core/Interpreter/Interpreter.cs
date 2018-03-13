@@ -23,7 +23,10 @@ namespace DuhnieLogo.Core.Interpreter
         {
             //this.tokens = new TokenStream(tokens);
 
-            procedures.Add("Print", new BuiltInProcedure() { Name = "Print" });
+            procedures.Add("Print", new BuiltInProcedure() { Name = "Print", Arguments = new string[] {"message"}, Implementation = (_globalMemory, _arguments) => {
+                Console.WriteLine(_arguments[0]);
+                return null;
+            } });
 
             globalMemory = new MemorySpace();
             memory = globalMemory;
@@ -168,7 +171,11 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var builtInProcedure = procedure as BuiltInProcedure;
 
-                return null;
+                var arguments = new List<object>();
+                for (int i = 0; i < builtInProcedure.Arguments.Length; i++)
+                    arguments.Add(InterpretNode(node.ArgumentExpressions[i]));
+
+                return builtInProcedure.Implementation(globalMemory, arguments.ToArray());
             }
 
             throw new Exception($"Unknown procedure type {procedure}");

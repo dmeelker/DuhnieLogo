@@ -17,7 +17,7 @@ namespace DuhnieLogo
                     0 + :a + :b
                 eind
 
-                Add 10*5 5";
+                Print Add 10*5 5";
 
             var tokens = Lexer.Tokenize(input);
 
