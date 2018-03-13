@@ -141,12 +141,21 @@ namespace DuhnieLogo.Core.Interpreter
                 return ((IntegerNode)node).Value;
             if (node is VariableNode)
                 return memory.Get(((VariableNode)node).Name);
+            if (node is ListNode)
+                return InterpretListNode(node as ListNode);
             if (node is ProcedureCallNode)
                 return InterpretProcedureCall(node as ProcedureCallNode);
             if (node is BinaryOperatorNode)
                 return InterpretBinaryOperator(node as BinaryOperatorNode);
 
             throw new Exception($"Unknown node: {node}");
+        }
+
+        private object InterpretListNode(ListNode listNode)
+        {
+            var values = listNode.ValueExpressions.Select(node => InterpretNode(node)).ToList();
+
+            return values;
         }
 
         private object InterpretProcedureCall(ProcedureCallNode node)
@@ -243,6 +252,18 @@ namespace DuhnieLogo.Core.Interpreter
                 tokens.Eat(TokenType.ParenthesisRight);
 
                 return node;
+            }
+            else if (tokens.CurrentToken.Type == TokenType.BracketLeft)
+            {
+                tokens.Eat(TokenType.BracketLeft);
+
+                var expressionNodes = new List<Node>();
+                while(tokens.CurrentToken.Type != TokenType.BracketRight)
+                    expressionNodes.Add(ParseExpression());
+
+                tokens.Eat(TokenType.BracketRight);
+
+                return new ListNode { ValueExpressions = expressionNodes.ToArray() };
             }
             else if (tokens.CurrentToken.Type == TokenType.Integer)
             {

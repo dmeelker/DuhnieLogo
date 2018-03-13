@@ -55,6 +55,16 @@ namespace DuhnieLogo.Core.Tokens
                     reader.ReadCharacter();
                     tokens.Add(new Token() { Type = TokenType.ParenthesisRight, Value = ")" });
                 }
+                else if (character == '[')
+                {
+                    reader.ReadCharacter();
+                    tokens.Add(new Token() { Type = TokenType.BracketLeft, Value = "[" });
+                }
+                else if (character == ']')
+                {
+                    reader.ReadCharacter();
+                    tokens.Add(new Token() { Type = TokenType.BracketRight, Value = "]" });
+                }
                 else if (character == '"')
                 {
                     reader.ReadCharacter();
