@@ -9,6 +9,6 @@ namespace DuhnieLogo.Core.Interpreter.Ast
     class ProcedureCallNode : Node
     {
         public string Name { get; set; }
-        public Node ArgumentExpressions { get; set; }
+        public Node[] ArgumentExpressions { get; set; }
     }
 }

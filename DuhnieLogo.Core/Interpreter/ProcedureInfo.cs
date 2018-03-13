@@ -9,5 +9,7 @@ namespace DuhnieLogo.Core.Interpreter
     class ProcedureInfo
     {
         public string Name { get; set; }
+
+        public string[] Arguments { get; set; } = new string[0];
     }
 }

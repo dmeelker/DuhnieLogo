@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DuhnieLogo.Core.Tokens;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace DuhnieLogo.Core.Interpreter
 {
     class CustomProcedureInfo : ProcedureInfo
     {
-        public int Location { get; set; }
+        public Token[] Tokens { get; set; }
     }
 }

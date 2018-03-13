@@ -13,23 +13,29 @@ namespace DuhnieLogo
         static void Main(string[] args)
         {
             var input = @"
-                leer Geef10
-                    Print
-                    10
+                leer Add :a :b
+                    0 + :a + :b
                 eind
 
-                leer Plus5
-                    Geef10 + 5
-                eind
-
-                10 + Plus5";
+                Add 10*5 5";
 
             var tokens = Lexer.Tokenize(input);
 
-            var interpreter = new Interpreter(tokens.ToArray());
-            var result = interpreter.Interpret();
+            var interpreter = new Interpreter();
+            var result = interpreter.Interpret(tokens.ToArray());
 
             Console.WriteLine($"Result: {result}");
+
+            //while (true)
+            //{
+            //    input = Console.ReadLine();
+            //    tokens = Lexer.Tokenize(input);
+
+            //    result = interpreter.Interpret(tokens.ToArray());
+            //    Console.WriteLine($"Result: {result}");
+            //}
+
+            
             Console.ReadLine();
         }
     }

@@ -10,22 +10,55 @@ namespace DuhnieLogo.Core.Interpreter
 {
     public class Interpreter
     {
-        private readonly TokenStream tokens;
-        private Dictionary<string, object> memory = new Dictionary<string, object>();
+        private Stack<TokenStream> tokenStack = new Stack<TokenStream>();
+        private TokenStream tokens;
+
+        private Stack<MemorySpace> memoryStack = new Stack<MemorySpace>();
+        private MemorySpace globalMemory;
+        private MemorySpace memory;
 
         private Dictionary<string, ProcedureInfo> procedures = new Dictionary<string, ProcedureInfo>();
-        private Stack<int> locationStack = new Stack<int>();
 
-        public Interpreter(Token[] tokens)
+        public Interpreter()
         {
-            this.tokens = new TokenStream(tokens);
+            //this.tokens = new TokenStream(tokens);
 
             procedures.Add("Print", new BuiltInProcedure() { Name = "Print" });
+
+            globalMemory = new MemorySpace();
+            memory = globalMemory;
         }
 
-        public object Interpret()
+        private void PushTokenStream(TokenStream tokenStream)
         {
-            return StatementList();
+            tokenStack.Push(tokens);
+            tokens = tokenStream;
+        }
+
+        private void PopTokenStream()
+        {
+            tokens = tokenStack.Pop();
+        }
+
+        private void PushMemorySpace(MemorySpace memory)
+        {
+            memoryStack.Push(this.memory);
+            this.memory = memory;
+        }
+
+        private void PopMemorySpace()
+        {
+            this.memory = memoryStack.Pop();
+        }
+
+        public object Interpret(Token[] tokens)
+        {
+            PushTokenStream(new TokenStream(tokens));
+
+            var result = StatementList();
+
+            PopTokenStream();
+            return result;
         }
 
         private object StatementList()
@@ -59,12 +92,24 @@ namespace DuhnieLogo.Core.Interpreter
             tokens.Eat(TokenType.Learn);
             
             procedureInfo.Name = tokens.Eat(TokenType.Word).Value;
-            procedureInfo.Location = tokens.Location;
+
+            var arguments = new List<string>();
+            while(tokens.CurrentToken.Type == TokenType.Colon)
+            {
+                tokens.Eat(TokenType.Colon);
+                arguments.Add(tokens.Eat(TokenType.Word).Value);
+            }
+            procedureInfo.Arguments = arguments.ToArray();
+
+            var procTokens = new List<Token>();
 
             while (tokens.CurrentToken.Type != TokenType.End)
-                tokens.Eat();
+                procTokens.Add(tokens.Eat());
+
+            procTokens.Add(new Token { Type = TokenType.ProgramEnd });
 
             tokens.Eat(TokenType.End);
+            procedureInfo.Tokens = procTokens.ToArray();
 
             procedures[procedureInfo.Name] = procedureInfo;
         }
@@ -76,7 +121,7 @@ namespace DuhnieLogo.Core.Interpreter
             var name = tokens.Eat(TokenType.Word);
             var value = Expression();
 
-            memory[name.Value] = value;
+            memory.Set(name.Value, value);
             return value;
         }
 
@@ -92,7 +137,7 @@ namespace DuhnieLogo.Core.Interpreter
             if (node is IntegerNode)
                 return ((IntegerNode)node).Value;
             if (node is VariableNode)
-                return memory[((VariableNode)node).Name];
+                return memory.Get(((VariableNode)node).Name);
             if (node is ProcedureCallNode)
                 return InterpretProcedureCall(node as ProcedureCallNode);
             if (node is BinaryOperatorNode)
@@ -108,17 +153,15 @@ namespace DuhnieLogo.Core.Interpreter
             if (procedure is CustomProcedureInfo)
             {
                 var customProcedure = procedure as CustomProcedureInfo;
-                locationStack.Push(tokens.Location);
 
-                tokens.Seek(customProcedure.Location);
-                object result = null;
+                var memorySpace = new MemorySpace(memory);
+                for (int i = 0; i < customProcedure.Arguments.Length; i++)
+                    memorySpace.Set(customProcedure.Arguments[i], InterpretNode(node.ArgumentExpressions[i]));
 
-                while (tokens.CurrentToken.Type != TokenType.End)
-                    result = Statement();
+                PushMemorySpace(memorySpace);
+                var result = Interpret(customProcedure.Tokens);
+                PopMemorySpace();
 
-                tokens.Eat(TokenType.End);
-
-                tokens.Seek(locationStack.Pop());
                 return result;
             }
             else if(procedure is BuiltInProcedure)
@@ -209,8 +252,14 @@ namespace DuhnieLogo.Core.Interpreter
             else if (tokens.CurrentToken.Type == TokenType.Word)
             {
                 var name = tokens.Eat(TokenType.Word).Value;
+                var procedure = procedures[name];
+                var argumentExpressions = new List<Node>();
+                for(int i=0; i<procedure.Arguments.Length; i++)
+                {
+                    argumentExpressions.Add(ParseExpression());
+                }
 
-                return new ProcedureCallNode { Name = name };
+                return new ProcedureCallNode { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
             }
 
             throw new Exception($"Unexpected token {tokens.CurrentToken}");
