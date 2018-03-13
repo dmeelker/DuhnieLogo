@@ -50,6 +50,7 @@ namespace DuhnieLogo.Core.Tokens
         Learn,
         End,
         Return,
+        Stop,
         ProgramEnd,
 
         NewLine,

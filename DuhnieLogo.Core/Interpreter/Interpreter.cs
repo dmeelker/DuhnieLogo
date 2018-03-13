@@ -23,13 +23,44 @@ namespace DuhnieLogo.Core.Interpreter
         {
             //this.tokens = new TokenStream(tokens);
 
-            procedures.Add("Print", new BuiltInProcedure() { Name = "Print", Arguments = new string[] {"message"}, Implementation = (_globalMemory, _arguments) => {
-                Console.WriteLine(_arguments[0]);
+            RegisterFunction("Print", new string[] {"message"}, (_globalMemory, _arguments) => {
+                var stringBuilder = new StringBuilder();
+
+                foreach(var arg in _arguments)
+                {
+                    if (arg is List<string>)
+                        stringBuilder.Append(string.Join(" ", arg as List<string>));
+                    else
+                        stringBuilder.Append(arg.ToString());
+                }
+
+                Console.WriteLine(stringBuilder.ToString());
                 return null;
-            } });
+            });
+
+            RegisterFunction("herhaal",  new string[] { "count", "commands" }, (_globalMemory, _arguments) => {
+                var memorySpace = new MemorySpace(memory);
+                PushMemorySpace(memorySpace);
+
+                var tokens = Lexer.Tokenize(string.Join(" ", (List<string>)_arguments[1])).ToArray();
+
+                for(int i=0; i<(int) _arguments[0]; i++)
+                {
+                    Interpret(tokens);
+                }
+
+                PopMemorySpace();
+
+                return null;
+            });
 
             globalMemory = new MemorySpace();
             memory = globalMemory;
+        }
+
+        public void RegisterFunction(string name, string[] arguments, Func<MemorySpace, object[], object> implementation)
+        {
+            procedures.Add(name.ToLower(), new BuiltInProcedure { Name = name, Arguments = arguments, Implementation = implementation });
         }
 
         private void PushTokenStream(TokenStream tokenStream)
@@ -57,8 +88,14 @@ namespace DuhnieLogo.Core.Interpreter
         public object Interpret(Token[] tokens)
         {
             PushTokenStream(new TokenStream(tokens));
-
-            var result = StatementList();
+            object result = null;
+            try
+            {
+                StatementList();
+            }catch(ReturnException ex)
+            {
+                result = ex.Value;
+            }
 
             PopTokenStream();
             return result;
@@ -66,13 +103,10 @@ namespace DuhnieLogo.Core.Interpreter
 
         private object StatementList()
         {
-            object result = null;
             while(tokens.CurrentToken.Type != TokenType.ProgramEnd)
-            {
-                result = Statement();
-            }
+                Statement();
 
-            return result;
+            return null;
         }
 
         private object Statement()
@@ -84,6 +118,10 @@ namespace DuhnieLogo.Core.Interpreter
                 ProcedureDeclaration();
                 return null;
             }
+            else if (tokens.CurrentToken.Type == TokenType.Return)
+                return ProcessReturn();
+            else if (tokens.CurrentToken.Type == TokenType.Stop)
+                return ProcessStop();
             else
                 return Expression();
         }
@@ -114,7 +152,21 @@ namespace DuhnieLogo.Core.Interpreter
             tokens.Eat(TokenType.End);
             procedureInfo.Tokens = procTokens.ToArray();
 
-            procedures[procedureInfo.Name] = procedureInfo;
+            procedures[procedureInfo.Name.ToLower()] = procedureInfo;
+        }
+
+        private object ProcessReturn()
+        {
+            tokens.Eat(TokenType.Return);
+            var result = Expression();
+
+            throw new ReturnException { Value = result };
+        }
+
+        private object ProcessStop()
+        {
+            tokens.Eat(TokenType.Stop);
+            throw new ReturnException();
         }
 
         private object VariableDefinition()
@@ -153,14 +205,12 @@ namespace DuhnieLogo.Core.Interpreter
 
         private object InterpretListNode(ListNode listNode)
         {
-            var values = listNode.ValueExpressions.Select(node => InterpretNode(node)).ToList();
-
-            return values;
+            return listNode.Values;
         }
 
         private object InterpretProcedureCall(ProcedureCallNode node)
         {
-            var procedure = procedures[node.Name];
+            var procedure = ResolveProcedure(node.Name);
 
             if (procedure is CustomProcedureInfo)
             {
@@ -180,11 +230,8 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var builtInProcedure = procedure as BuiltInProcedure;
 
-                var arguments = new List<object>();
-                for (int i = 0; i < builtInProcedure.Arguments.Length; i++)
-                    arguments.Add(InterpretNode(node.ArgumentExpressions[i]));
-
-                return builtInProcedure.Implementation(globalMemory, arguments.ToArray());
+                var arguments = node.ArgumentExpressions.Select(arg => InterpretNode(arg)).ToArray();
+                return builtInProcedure.Implementation(globalMemory, arguments);
             }
 
             throw new Exception($"Unknown procedure type {procedure}");
@@ -248,7 +295,25 @@ namespace DuhnieLogo.Core.Interpreter
             if(tokens.CurrentToken.Type == TokenType.ParenthesisLeft)
             {
                 tokens.Eat(TokenType.ParenthesisLeft);
-                var node = ParseExpression();
+
+                Node node;
+
+                if(tokens.CurrentToken.Type == TokenType.Word)
+                {
+                    // Vararg procedure call
+                    var name = tokens.Eat(TokenType.Word).Value;
+                    var procedure = ResolveProcedure(name);
+                    var argumentExpressions = new List<Node>();
+                    while(tokens.CurrentToken.Type != TokenType.ParenthesisRight)
+                        argumentExpressions.Add(ParseExpression());
+
+                    node = new ProcedureCallNode { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
+                }
+                else
+                {
+                    node = ParseExpression();
+                }
+
                 tokens.Eat(TokenType.ParenthesisRight);
 
                 return node;
@@ -257,13 +322,13 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 tokens.Eat(TokenType.BracketLeft);
 
-                var expressionNodes = new List<Node>();
+                var values = new List<string>();
                 while(tokens.CurrentToken.Type != TokenType.BracketRight)
-                    expressionNodes.Add(ParseExpression());
+                    values.Add(tokens.Eat().Value);
 
                 tokens.Eat(TokenType.BracketRight);
 
-                return new ListNode { ValueExpressions = expressionNodes.ToArray() };
+                return new ListNode { Values = values };
             }
             else if (tokens.CurrentToken.Type == TokenType.Integer)
             {
@@ -280,17 +345,20 @@ namespace DuhnieLogo.Core.Interpreter
             else if (tokens.CurrentToken.Type == TokenType.Word)
             {
                 var name = tokens.Eat(TokenType.Word).Value;
-                var procedure = procedures[name];
+                var procedure = ResolveProcedure(name);
                 var argumentExpressions = new List<Node>();
                 for(int i=0; i<procedure.Arguments.Length; i++)
-                {
                     argumentExpressions.Add(ParseExpression());
-                }
 
                 return new ProcedureCallNode { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
             }
 
             throw new Exception($"Unexpected token {tokens.CurrentToken}");
+        }
+
+        private ProcedureInfo ResolveProcedure(string name)
+        {
+            return procedures[name.ToLower()];
         }
     }
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DuhnieLogo.Core.Interpreter.Ast
+namespace DuhnieLogo.Core.Interpreter
 {
-    class ListNode : Node
+    class ReturnException : Exception
     {
-        public List<string> Values { get; set; }
+        public object Value { get; set; }
     }
 }

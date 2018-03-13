@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DuhnieLogo.Core.Interpreter
 {
-    class MemorySpace
+    public class MemorySpace
     {
         private readonly Dictionary<string, object> data = new Dictionary<string, object>();
         private readonly MemorySpace parentSpace;

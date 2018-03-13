@@ -175,6 +175,12 @@ namespace DuhnieLogo.Core.Tokens
                     if (value == "eind")
                         return new Token() { Type = TokenType.End, Value = value };
 
+                    if (value == "uitvoer")
+                        return new Token() { Type = TokenType.Return, Value = value };
+
+                    if (value == "stop")
+                        return new Token() { Type = TokenType.Stop, Value = value };
+
                     return new Token()
                     {
                         Type = TokenType.Word,
