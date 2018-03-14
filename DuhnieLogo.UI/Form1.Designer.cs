@@ -41,6 +41,8 @@
             // 
             // txtInput
             // 
+            this.txtInput.AcceptsReturn = true;
+            this.txtInput.AcceptsTab = true;
             this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -48,6 +50,7 @@
             this.txtInput.Location = new System.Drawing.Point(12, 12);
             this.txtInput.Multiline = true;
             this.txtInput.Name = "txtInput";
+            this.txtInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtInput.Size = new System.Drawing.Size(557, 397);
             this.txtInput.TabIndex = 0;
             this.txtInput.Text = resources.GetString("txtInput.Text");

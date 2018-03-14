@@ -15,6 +15,11 @@ namespace DuhnieLogo.UI.Model
         }
 
         public Graphics GraphicsContext { get; set; }
+
+        public Bitmap BufferBitmap { get; set; }
+        public Graphics BufferContext { get; set; }
+
+        public Image Image { get; set; }
         public Point Location { get; set; }
         public int Orientation { get; set; }
         public bool PenDown { get; set; } = true;
@@ -64,11 +69,34 @@ namespace DuhnieLogo.UI.Model
 
         public void Move(float x, float y)
         {
+            var oldLocation = Location.Clone();
+
             if(PenDown)
-                GraphicsContext.DrawLine(pen, Location.X, Location.Y, x, y);
+                BufferContext.DrawLine(pen, Location.X, Location.Y, x, y);
 
             Location.X = x;
             Location.Y = y;
+
+            var updateRectangle = new Rectangle()
+            {
+                X = (int)Math.Ceiling(Math.Min(oldLocation.X, Location.X)) - 1,
+                Y = (int)Math.Ceiling(Math.Min(oldLocation.Y, Location.Y)) - 1
+            };
+
+            updateRectangle.Width = 2 + (int)Math.Ceiling(Math.Max(oldLocation.X, Location.X)) - updateRectangle.X;
+            updateRectangle.Height = 2 + (int)Math.Ceiling(Math.Max(oldLocation.Y, Location.Y)) - updateRectangle.Y;
+
+            // Copy the modified bit of the drawing buffer
+            GraphicsContext.DrawImage(BufferBitmap, updateRectangle, updateRectangle, GraphicsUnit.Pixel);
+
+            // Replace the area where the turtle image was
+            GraphicsContext.DrawImage(BufferBitmap,
+                new Rectangle((int)oldLocation.X, (int)oldLocation.Y, Image.Width, Image.Height),
+                new Rectangle((int)oldLocation.X, (int)oldLocation.Y, Image.Width, Image.Height),
+                GraphicsUnit.Pixel);
+
+            // Draw the turtle in the new location
+            GraphicsContext.DrawImage(Image, (int) Location.X, (int) Location.Y);
         }
 
         public void Left(int steps)
@@ -87,3 +115,4 @@ namespace DuhnieLogo.UI.Model
         }
     }
 }
+

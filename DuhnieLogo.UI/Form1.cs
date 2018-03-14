@@ -37,12 +37,23 @@ namespace DuhnieLogo.UI
 
         private void btnRun_Click(object sender, EventArgs e)
         {
+            var buffer = new Bitmap(panViewport.Width, panViewport.Height);
+
             using (var g = panViewport.CreateGraphics())
+            using(var bufferG = Graphics.FromImage(buffer))
             {
                 g.Clear(Color.White);
+                bufferG.Clear(Color.White);
 
                 var tokens = Lexer.Tokenize(txtInput.Text).ToArray();
-                var turtle = new Turtle() { GraphicsContext= g, Location = new Model.Point(panViewport.Width / 2, panViewport.Height / 2)};
+                var turtle = new Turtle() {
+                    GraphicsContext = g,
+                    BufferBitmap = buffer,
+                    BufferContext = bufferG,
+                    Location = new Model.Point(panViewport.Width / 2, panViewport.Height / 2),
+                    Image = Image.FromFile("images/turtle.png")
+                };
+
                 var interpreter = new Interpreter();
                 interpreter.RegisterFunction("vooruit", new string[] { "stappen" }, (_memorySpace, _arguments) => {
                     turtle.Forward((int)_arguments[0]);

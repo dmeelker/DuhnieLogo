@@ -17,5 +17,10 @@ namespace DuhnieLogo.UI.Model
 
         public float X { get; set; }
         public float Y { get; set; }
+
+        public Point Clone()
+        {
+            return new Point(X, Y);
+        }
     }
 }
