@@ -23,23 +23,6 @@ namespace DuhnieLogo.Core.Interpreter
 
         public Interpreter()
         {
-            //this.tokens = new TokenStream(tokens);
-
-            RegisterFunction("Print", new string[] {"message"}, (_globalMemory, _arguments) => {
-                var stringBuilder = new StringBuilder();
-
-                foreach(var arg in _arguments)
-                {
-                    if (arg is List<string>)
-                        stringBuilder.Append(string.Join(" ", arg as List<string>));
-                    else
-                        stringBuilder.Append(arg.ToString());
-                }
-
-                Console.WriteLine(stringBuilder.ToString());
-                return null;
-            });
-
             RegisterFunction("herhaal",  new string[] { "count", "commands" }, (_globalMemory, _arguments) => {
                 var memorySpace = new MemorySpace(memory);
                 PushMemorySpace(memorySpace);
@@ -48,12 +31,20 @@ namespace DuhnieLogo.Core.Interpreter
 
                 for(int i=0; i<(int) _arguments[0]; i++)
                 {
+                    memorySpace.Set("iteratie", i+1);
                     Interpret(tokens);
                 }
 
                 PopMemorySpace();
 
                 return null;
+            });
+
+            RegisterFunction("telherhaal", new string[] {}, (_globalMemory, _arguments) => {
+                if (!memory.Contains("iteratie"))
+                    throw new ScriptException("Telherhaal kan alleen binnen een herhaal opdracht gebruikt worden");
+
+                return memory.Get("iteratie");
             });
 
             RegisterFunction("lijst", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
@@ -168,7 +159,7 @@ namespace DuhnieLogo.Core.Interpreter
             while (tokens.CurrentToken.Type != TokenType.End)
                 procTokens.Add(tokens.Eat());
 
-            procTokens.Add(new Token { Type = TokenType.ProgramEnd });
+            procTokens.Add(new Token(TokenType.ProgramEnd, "", new TokenPosition(0, 0)));
 
             tokens.Eat(TokenType.End);
             procedureInfo.Tokens = procTokens.ToArray();
@@ -213,7 +204,13 @@ namespace DuhnieLogo.Core.Interpreter
             if (node is IntegerNode)
                 return ((IntegerNode)node).Value;
             if (node is VariableNode)
-                return memory.Get(((VariableNode)node).Name);
+            {
+                var variableNode = node as VariableNode;
+                if (memory.Contains(variableNode.Name.Value))
+                    return memory.Get(variableNode.Name.Value);
+                else
+                    throw new ScriptException($"Onbekende variabele '{variableNode.Name.Value}'", variableNode.Name);
+            }
             if (node is ListNode)
                 return InterpretListNode(node as ListNode);
             if (node is ProcedureCallNode)
@@ -322,7 +319,7 @@ namespace DuhnieLogo.Core.Interpreter
                 if(tokens.CurrentToken.Type == TokenType.Word)
                 {
                     // Vararg procedure call
-                    var name = tokens.Eat(TokenType.Word).Value;
+                    var name = tokens.Eat(TokenType.Word);
                     var procedure = ResolveProcedure(name);
                     var argumentExpressions = new List<Node>();
                     while(tokens.CurrentToken.Type != TokenType.ParenthesisRight)
@@ -359,13 +356,13 @@ namespace DuhnieLogo.Core.Interpreter
             else if (tokens.CurrentToken.Type == TokenType.Colon)
             {
                 tokens.Eat(TokenType.Colon);
-                var variableName = tokens.Eat(TokenType.Word).Value;
+                var variableName = tokens.Eat(TokenType.Word);
                 
                 return new VariableNode { Name = variableName };
             }
             else if (tokens.CurrentToken.Type == TokenType.Word)
             {
-                var name = tokens.Eat(TokenType.Word).Value;
+                var name = tokens.Eat(TokenType.Word);
                 var procedure = ResolveProcedure(name);
                 var argumentExpressions = new List<Node>();
                 for(int i=0; i<procedure.Arguments.Length; i++)
@@ -374,12 +371,17 @@ namespace DuhnieLogo.Core.Interpreter
                 return new ProcedureCallNode { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
             }
 
-            throw new Exception($"Unexpected token {tokens.CurrentToken}");
+            throw new ScriptException($"Onverwachte invoer: {tokens.CurrentToken}", tokens.CurrentToken);
         }
 
-        private ProcedureInfo ResolveProcedure(string name)
+        private ProcedureInfo ResolveProcedure(Token token)
         {
-            return procedures[name.ToLower()];
+            var name = token.Value.ToLower();
+
+            if (!procedures.ContainsKey(name))
+                throw new ScriptException($"Onbekende procedure '{name}'", token);
+
+            return procedures[name];
         }
     }
 }

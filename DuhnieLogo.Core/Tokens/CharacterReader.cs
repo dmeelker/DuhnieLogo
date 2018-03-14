@@ -10,6 +10,10 @@ namespace DuhnieLogo.Core.Tokens
     {
         private string input;
         private int currentIndex;
+        public int CurrentRow { get; private set; }
+        public int CurrentColumn { get; private set; }
+
+        public TokenPosition CurrentPosition => new TokenPosition(CurrentRow, CurrentColumn);
 
         public CharacterReader(string input)
         {
@@ -25,9 +29,18 @@ namespace DuhnieLogo.Core.Tokens
             currentIndex++;
             var chr = input[currentIndex];
             
+            if(chr == '\n')
+            {
+                CurrentRow++;
+                CurrentColumn = 0;
+            } else
+            {
+                CurrentColumn++;
+            }
 
             return chr;
         }
+
         public char? PeekCharacter()
         {
             if (!CanPeek)

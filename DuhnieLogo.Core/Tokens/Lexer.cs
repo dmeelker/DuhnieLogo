@@ -20,86 +20,75 @@ namespace DuhnieLogo.Core.Tokens
 
                 if (character == '+')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Plus, Value = "+"});
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Plus));
                 }
                 else if (character == '-')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Minus, Value = "-" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Minus));
                 }
                 else if (character == '*')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Multiply, Value = "*" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Multiply));
                 }
                 else if (character == '/')
                 {
                     reader.ReadCharacter();
+                    var position = reader.CurrentPosition;
 
-                    if(reader.PeekCharacter() == '/')
+                    if (reader.PeekCharacter() == '/')
                     {
                         while (reader.PeekCharacter() != '\n')
                             reader.ReadCharacter();
                     }
                     else
-                        tokens.Add(new Token() { Type = TokenType.Divide, Value = "/" });
+                        tokens.Add(new Token(TokenType.Divide, "/", position));
                 }
                 else if (character == '(')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.ParenthesisLeft, Value = "(" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.ParenthesisLeft));
                 }
                 else if (character == ')')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.ParenthesisRight, Value = ")" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.ParenthesisRight));
                 }
                 else if (character == '[')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.BracketLeft, Value = "[" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.BracketLeft));
                 }
                 else if (character == ']')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.BracketRight, Value = "]" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.BracketRight));
                 }
                 else if (character == '"')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.DoubleQuote, Value = "\"" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.DoubleQuote));
                 }
                 else if (character == ':')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Colon, Value = ":" });
-                }
-                else if (character == ';')
-                {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Semicolon, Value = ";" });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Colon));
                 }
                 else if (character == '=')
                 {
                     reader.ReadCharacter();
+                    var position = reader.CurrentPosition;
 
                     if(reader.PeekCharacter() == '=')
                     {
                         reader.ReadCharacter();
-                        tokens.Add(new Token() { Type = TokenType.Equals, Value = "==" });
+                        tokens.Add(new Token(TokenType.Equals, "==", position));
                     }
                     else
-                        tokens.Add(new Token() { Type = TokenType.Assign, Value = "=" });
+                        tokens.Add(new Token(TokenType.Assign, "=", position));
                 }
                 else if (character == '&')
                 {
                     reader.ReadCharacter();
+                    var position = reader.CurrentPosition;
 
                     if (reader.PeekCharacter() == '&')
                     {
                         reader.ReadCharacter();
-                        tokens.Add(new Token() { Type = TokenType.LogicalAnd, Value = "&&" });
+                        tokens.Add(new Token(TokenType.LogicalAnd, "&&", position));
                     }
                     else
                         throw new Exception();
@@ -107,19 +96,19 @@ namespace DuhnieLogo.Core.Tokens
                 else if (character == '|')
                 {
                     reader.ReadCharacter();
+                    var position = reader.CurrentPosition;
 
                     if (reader.PeekCharacter() == '|')
                     {
                         reader.ReadCharacter();
-                        tokens.Add(new Token() { Type = TokenType.LogicalOr, Value = "||" });
+                        tokens.Add(new Token(TokenType.LogicalOr, "||", position));
                     }
                     else
                         throw new Exception();
                 }
                 else if (character == ',')
                 {
-                    reader.ReadCharacter();
-                    tokens.Add(new Token() { Type = TokenType.Comma, Value = "," });
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Comma));
                 }
                 else if (Char.IsLetter(character))
                 {
@@ -128,10 +117,6 @@ namespace DuhnieLogo.Core.Tokens
                 else if (Char.IsNumber(character))
                 {
                     tokens.Add(ParseNumber(reader));
-                }
-                else if (character == '"')
-                {
-                    tokens.Add(ParseStringLiteral(reader));
                 }
                 else if (Char.IsWhiteSpace(character) || character == '\n' || character == '\r')
                 {
@@ -143,15 +128,23 @@ namespace DuhnieLogo.Core.Tokens
                     throw new Exception($"Unexpected character: {character}");
                 }
             }
-            tokens.Add(new Token { Type = TokenType.ProgramEnd });
+            tokens.Add(new Token (TokenType.ProgramEnd, "", reader.CurrentPosition));
 
             return tokens;
+        }
+
+        private static Token ReadCharacterAndCreateToken(CharacterReader reader, TokenType type)
+        {
+            var character = reader.ReadCharacter();
+            var position = reader.CurrentPosition;
+
+            return new Token(type, character.Value.ToString(), position);
         }
 
         private static Token ParseKeywordOrIdentifier(CharacterReader reader)
         {
             var buffer = new StringBuilder();
-
+            TokenPosition position = null;
             while (true)
             {
                 var character = reader.PeekCharacter().Value;
@@ -160,32 +153,30 @@ namespace DuhnieLogo.Core.Tokens
                 {
                     buffer.Append(character);
                     reader.ReadCharacter();
+
+                    if (position == null)
+                        position = reader.CurrentPosition;
                 }
                 else
                 {
                     var value = buffer.ToString();
 
-                    
                     if (value == "maak" || value == "naam")
-                        return new Token() { Type = TokenType.Make, Value = value };
+                        return new Token(TokenType.Make, value, position);
 
                     if (value == "leer")
-                        return new Token() { Type = TokenType.Learn, Value = value };
+                        return new Token(TokenType.Learn, value, position);
 
                     if (value == "eind")
-                        return new Token() { Type = TokenType.End, Value = value };
+                        return new Token(TokenType.End, value, position);
 
                     if (value == "uitvoer")
-                        return new Token() { Type = TokenType.Return, Value = value };
+                        return new Token(TokenType.Return, value, position);
 
                     if (value == "stop")
-                        return new Token() { Type = TokenType.Stop, Value = value };
+                        return new Token(TokenType.Stop, value, position);
 
-                    return new Token()
-                    {
-                        Type = TokenType.Word,
-                        Value = value
-                    };
+                    return new Token(TokenType.Word, value, position);
                 }
             }
         }
@@ -193,6 +184,7 @@ namespace DuhnieLogo.Core.Tokens
         private static Token ParseNumber(CharacterReader reader)
         {
             var buffer = new StringBuilder();
+            TokenPosition position = null;
 
             while (true)
             {
@@ -202,42 +194,13 @@ namespace DuhnieLogo.Core.Tokens
                 {
                     buffer.Append(character);
                     reader.ReadCharacter();
+
+                    if (position == null)
+                        position = reader.CurrentPosition;
                 }
                 else
                 {
-                    return new Token()
-                    {
-                        Type = TokenType.Integer,
-                        Value = buffer.ToString()
-                    };
-                }
-            }
-        }
-
-        private static Token ParseStringLiteral(CharacterReader reader)
-        {
-            var buffer = new StringBuilder();
-
-            reader.ReadCharacter(); // Read the opening character
-
-            while (true)
-            {
-                var character = reader.PeekCharacter().Value;
-
-                if (character == '"')
-                {
-                    reader.ReadCharacter();
-
-                    return new Token()
-                    {
-                        Type = TokenType.StringLiteral,
-                        Value = buffer.ToString()
-                    };
-                }
-                else
-                {
-                    buffer.Append(character);
-                    reader.ReadCharacter();
+                    return new Token(TokenType.Integer, buffer.ToString(), position);
                 }
             }
         }

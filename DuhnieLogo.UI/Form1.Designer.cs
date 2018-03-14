@@ -33,10 +33,12 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnRun = new System.Windows.Forms.Button();
             this.panViewport = new System.Windows.Forms.Panel();
+            this.txtOutput = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.panViewport.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtInput
@@ -89,11 +91,25 @@
             // panViewport
             // 
             this.panViewport.BackColor = System.Drawing.Color.White;
+            this.panViewport.Controls.Add(this.txtOutput);
             this.panViewport.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panViewport.Location = new System.Drawing.Point(0, 0);
             this.panViewport.Name = "panViewport";
             this.panViewport.Size = new System.Drawing.Size(588, 450);
             this.panViewport.TabIndex = 0;
+            // 
+            // txtOutput
+            // 
+            this.txtOutput.BackColor = System.Drawing.Color.White;
+            this.txtOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.txtOutput.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtOutput.Location = new System.Drawing.Point(0, 348);
+            this.txtOutput.Multiline = true;
+            this.txtOutput.Name = "txtOutput";
+            this.txtOutput.ReadOnly = true;
+            this.txtOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtOutput.Size = new System.Drawing.Size(588, 102);
+            this.txtOutput.TabIndex = 0;
             // 
             // Form1
             // 
@@ -108,6 +124,8 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.panViewport.ResumeLayout(false);
+            this.panViewport.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -118,6 +136,7 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnRun;
         private System.Windows.Forms.Panel panViewport;
+        private System.Windows.Forms.TextBox txtOutput;
     }
 }
 

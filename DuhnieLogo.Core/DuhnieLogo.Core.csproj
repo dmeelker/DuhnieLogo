@@ -52,11 +52,13 @@
     <Compile Include="Interpreter\MemorySpace.cs" />
     <Compile Include="Interpreter\ProcedureInfo.cs" />
     <Compile Include="Interpreter\ReturnException.cs" />
+    <Compile Include="Interpreter\ScriptException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tokens\CharacterReader.cs" />
     <Compile Include="Tokens\Keywords.cs" />
     <Compile Include="Tokens\Lexer.cs" />
     <Compile Include="Tokens\Token.cs" />
+    <Compile Include="Tokens\TokenPosition.cs" />
     <Compile Include="Tokens\TokenStream.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

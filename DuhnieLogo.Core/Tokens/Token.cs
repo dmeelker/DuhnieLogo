@@ -10,6 +10,14 @@ namespace DuhnieLogo.Core.Tokens
     {
         public TokenType Type { get; set; }
         public string Value { get; set; }
+        public TokenPosition Location { get; set; }
+
+        public Token(TokenType type, string value, TokenPosition location)
+        {
+            Type = type;
+            Value = value;
+            Location = location;
+        }
 
         public override string ToString()
         {

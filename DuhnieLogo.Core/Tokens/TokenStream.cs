@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DuhnieLogo.Core.Interpreter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,7 @@ namespace DuhnieLogo.Core.Tokens
         {
             var token = CurrentToken;
             if (type != null && token.Type != type)
-                throw new Exception($"Unexpected token: {token}, expected {type}");
+                throw new ScriptException($"Onverwachte invoer: {token}, verwacht: {type}");
 
             currentIndex++;
             return token;

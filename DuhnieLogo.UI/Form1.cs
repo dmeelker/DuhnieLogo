@@ -44,6 +44,7 @@ namespace DuhnieLogo.UI
             {
                 g.Clear(Color.White);
                 bufferG.Clear(Color.White);
+                ClearConsole();
 
                 var tokens = Lexer.Tokenize(txtInput.Text).ToArray();
                 var turtle = new Turtle() {
@@ -55,8 +56,30 @@ namespace DuhnieLogo.UI
                 };
 
                 var interpreter = new Interpreter();
+
+                interpreter.RegisterFunction("print", new string[] { "message" }, (_globalMemory, _arguments) => {
+                    var stringBuilder = new StringBuilder();
+
+                    foreach (var arg in _arguments)
+                    {
+                        if (arg is List<string>)
+                            stringBuilder.Append(string.Join(" ", arg as List<string>));
+                        else
+                            stringBuilder.Append(arg.ToString());
+                    }
+
+                    WriteToConsole(stringBuilder.ToString());
+                    
+                    return null;
+                });
+
                 interpreter.RegisterFunction("vooruit", new string[] { "stappen" }, (_memorySpace, _arguments) => {
                     turtle.Forward((int)_arguments[0]);
+                    return null;
+                });
+
+                interpreter.RegisterFunction("achteruit", new string[] { "stappen" }, (_memorySpace, _arguments) => {
+                    turtle.Forward(-(int)_arguments[0]);
                     return null;
                 });
 
@@ -92,8 +115,41 @@ namespace DuhnieLogo.UI
                     return null;
                 });
 
-                interpreter.Interpret(tokens);
+                interpreter.RegisterFunction("wistekening", new string[] { }, (_memorySpace, _arguments) => {
+                    g.Clear(Color.White);
+                    bufferG.Clear(Color.White);
+                    return null;
+                });
+
+                try
+                {
+                    interpreter.Interpret(tokens);
+                }
+                catch(ScriptException ex)
+                {
+                    if(ex.Token != null)
+                        WriteToConsole($"Er is een fout opgetreden: {ex.Message} (Regel: {ex.Token.Location.Row + 1}, Teken: {ex.Token.Location.Column + 1})");
+                    else
+                        WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
+                }
             }
+        }
+
+        private void ClearConsole()
+        {
+            txtOutput.Text = "";
+        }
+
+        private void WriteToConsole(string message)
+        {
+            if (txtOutput.Text.Length > 0)
+                txtOutput.AppendText(Environment.NewLine);
+
+            txtOutput.AppendText(message);
         }
     }
 }

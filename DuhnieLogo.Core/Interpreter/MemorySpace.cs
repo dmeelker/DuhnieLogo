@@ -21,6 +21,17 @@ namespace DuhnieLogo.Core.Interpreter
             parentSpace = parent;
         }
 
+        public bool Contains(string key)
+        {
+            if (data.ContainsKey(key))
+                return true;
+
+            if (parentSpace != null)
+                return parentSpace.Contains(key);
+
+            return false;
+        }
+
         public object Get(string key)
         {
             if(data.ContainsKey(key))

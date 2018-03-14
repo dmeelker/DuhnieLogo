@@ -1,0 +1,5 @@
+leer Ster lengte
+ herhaal 60 [vooruit lengte penop achteruit lengte penneer rechts 6]
+eind
+
+herhaal 10 [zetpendikte 11 - telherhaal Ster 50  telherhaal]
