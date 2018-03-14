@@ -18,6 +18,7 @@ namespace DuhnieLogo.Core.Interpreter
         private MemorySpace memory;
 
         private Dictionary<string, ProcedureInfo> procedures = new Dictionary<string, ProcedureInfo>();
+        private readonly Random random = new Random();
 
         public Interpreter()
         {
@@ -52,6 +53,20 @@ namespace DuhnieLogo.Core.Interpreter
                 PopMemorySpace();
 
                 return null;
+            });
+
+            RegisterFunction("lijst", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
+                var result = new List<string>();
+
+                foreach (var arg in _arguments)
+                    result.Add(arg.ToString());
+
+                return result;
+            });
+
+            RegisterFunction("gok", new string[] { "maximum" }, (_globalMemory, _arguments) => {
+                var max = (int)_arguments[0];
+                return random.Next(max - 1);
             });
 
             globalMemory = new MemorySpace();

@@ -34,6 +34,16 @@ namespace DuhnieLogo.UI.Model
             }
         }
 
+        private Color penColor = Color.Black;
+        public Color PenColor
+        {
+            get { return penColor; }
+            set {
+                penColor = value;
+                RecreatePen();
+            }
+        }
+
         private Pen pen;
 
         private void RecreatePen()
@@ -41,7 +51,7 @@ namespace DuhnieLogo.UI.Model
             if (pen != null)
                 pen.Dispose();
 
-            pen = new Pen(Color.Black, PenWidth);
+            pen = new Pen(PenColor, PenWidth);
         }
 
 

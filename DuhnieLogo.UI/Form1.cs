@@ -74,6 +74,13 @@ namespace DuhnieLogo.UI
                     return null;
                 });
 
+                interpreter.RegisterFunction("zetpenkleur", new string[] { "kleur" }, (_memorySpace, _arguments) => {
+                    var values = (List<string>)_arguments[0];
+
+                    turtle.PenColor = Color.FromArgb(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToInt32(values[2]));
+                    return null;
+                });
+
                 interpreter.Interpret(tokens);
             }
         }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.txtInput = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnRun = new System.Windows.Forms.Button();
@@ -49,8 +50,7 @@
             this.txtInput.Name = "txtInput";
             this.txtInput.Size = new System.Drawing.Size(557, 397);
             this.txtInput.TabIndex = 0;
-            this.txtInput.Text = "leer cirkel\r\n\therhaal 360 [vooruit 1 rechts 1]\r\neind\r\n\r\nherhaal 20 [cirkel rechts" +
-    " 360/20]\r\n";
+            this.txtInput.Text = resources.GetString("txtInput.Text");
             this.txtInput.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // splitContainer1
