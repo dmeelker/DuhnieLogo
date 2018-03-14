@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuhnieLogo.Cli", "DuhnieLog
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuhnieLogo.Core", "DuhnieLogo.Core\DuhnieLogo.Core.csproj", "{4DDF9DE9-F131-44F5-BA5F-2CB07D29F3A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuhnieLogo.UI", "DuhnieLogo.UI\DuhnieLogo.UI.csproj", "{BA03C0BD-A6AC-4D80-A195-040634E47DDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4DDF9DE9-F131-44F5-BA5F-2CB07D29F3A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DDF9DE9-F131-44F5-BA5F-2CB07D29F3A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DDF9DE9-F131-44F5-BA5F-2CB07D29F3A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA03C0BD-A6AC-4D80-A195-040634E47DDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA03C0BD-A6AC-4D80-A195-040634E47DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA03C0BD-A6AC-4D80-A195-040634E47DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA03C0BD-A6AC-4D80-A195-040634E47DDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
