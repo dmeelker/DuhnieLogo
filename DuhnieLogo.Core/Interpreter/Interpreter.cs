@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DuhnieLogo.Core.Interpreter
@@ -67,6 +68,11 @@ namespace DuhnieLogo.Core.Interpreter
             RegisterFunction("gok", new string[] { "maximum" }, (_globalMemory, _arguments) => {
                 var max = (int)_arguments[0];
                 return random.Next(max - 1);
+            });
+
+            RegisterFunction("wacht", new string[] { "duration" }, (_globalMemory, _arguments) => {
+                Thread.Sleep((int)_arguments[0]);
+                return null;
             });
 
             globalMemory = new MemorySpace();
