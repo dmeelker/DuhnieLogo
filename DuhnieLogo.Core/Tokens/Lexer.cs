@@ -32,16 +32,12 @@ namespace DuhnieLogo.Core.Tokens
                 }
                 else if (character == '/')
                 {
-                    reader.ReadCharacter();
-                    var position = reader.CurrentPosition;
-
-                    if (reader.PeekCharacter() == '/')
-                    {
-                        while (reader.PeekCharacter() != '\n')
-                            reader.ReadCharacter();
-                    }
-                    else
-                        tokens.Add(new Token(TokenType.Divide, "/", position));
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Divide));
+                }
+                else if (character == ';')
+                {
+                    while (reader.PeekCharacter() != '\n')
+                        reader.ReadCharacter();
                 }
                 else if (character == '(')
                 {
@@ -69,42 +65,7 @@ namespace DuhnieLogo.Core.Tokens
                 }
                 else if (character == '=')
                 {
-                    reader.ReadCharacter();
-                    var position = reader.CurrentPosition;
-
-                    if(reader.PeekCharacter() == '=')
-                    {
-                        reader.ReadCharacter();
-                        tokens.Add(new Token(TokenType.Equals, "==", position));
-                    }
-                    else
-                        tokens.Add(new Token(TokenType.Assign, "=", position));
-                }
-                else if (character == '&')
-                {
-                    reader.ReadCharacter();
-                    var position = reader.CurrentPosition;
-
-                    if (reader.PeekCharacter() == '&')
-                    {
-                        reader.ReadCharacter();
-                        tokens.Add(new Token(TokenType.LogicalAnd, "&&", position));
-                    }
-                    else
-                        throw new Exception();
-                }
-                else if (character == '|')
-                {
-                    reader.ReadCharacter();
-                    var position = reader.CurrentPosition;
-
-                    if (reader.PeekCharacter() == '|')
-                    {
-                        reader.ReadCharacter();
-                        tokens.Add(new Token(TokenType.LogicalOr, "||", position));
-                    }
-                    else
-                        throw new Exception();
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Equals));
                 }
                 else if (character == ',')
                 {
@@ -159,7 +120,7 @@ namespace DuhnieLogo.Core.Tokens
                 }
                 else
                 {
-                    var value = buffer.ToString();
+                    var value = buffer.ToString().ToLower();
 
                     if (value == "maak" || value == "naam")
                         return new Token(TokenType.Make, value, position);

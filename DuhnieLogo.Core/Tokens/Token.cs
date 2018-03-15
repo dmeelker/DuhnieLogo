@@ -50,6 +50,7 @@ namespace DuhnieLogo.Core.Tokens
         ParenthesisRight,
         BracketLeft,
         BracketRight,
+        StringEscape,
 
         Colon,
         Semicolon,
