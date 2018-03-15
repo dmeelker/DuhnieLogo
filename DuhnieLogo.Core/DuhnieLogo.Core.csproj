@@ -45,6 +45,7 @@
     <Compile Include="Interpreter\Ast\ListNode.cs" />
     <Compile Include="Interpreter\Ast\Node.cs" />
     <Compile Include="Interpreter\Ast\ProcedureCallNode.cs" />
+    <Compile Include="Interpreter\Ast\StringLiteralNode.cs" />
     <Compile Include="Interpreter\Ast\VariableNode.cs" />
     <Compile Include="Interpreter\BuiltInProcedure.cs" />
     <Compile Include="Interpreter\Interpreter.cs" />

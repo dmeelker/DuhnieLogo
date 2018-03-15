@@ -56,6 +56,15 @@ namespace DuhnieLogo.Core.Interpreter
                 return result;
             });
 
+            RegisterFunction("woord", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
+                var result = new StringBuilder();
+
+                foreach (var arg in _arguments)
+                    result.Append(arg.ToString());
+
+                return result.ToString();
+            });
+
             RegisterFunction("gok", new string[] { "maximum" }, (_globalMemory, _arguments) => {
                 var max = (int)_arguments[0];
                 return random.Next(max - 1);
@@ -144,13 +153,13 @@ namespace DuhnieLogo.Core.Interpreter
 
             tokens.Eat(TokenType.Learn);
             
-            procedureInfo.Name = tokens.Eat(TokenType.Word).Value;
+            procedureInfo.Name = tokens.Eat(TokenType.Identifier).Value;
 
             var arguments = new List<string>();
             while(tokens.CurrentToken.Type == TokenType.Colon)
             {
                 tokens.Eat(TokenType.Colon);
-                arguments.Add(tokens.Eat(TokenType.Word).Value);
+                arguments.Add(tokens.Eat(TokenType.Identifier).Value);
             }
             procedureInfo.Arguments = arguments.ToArray();
 
@@ -184,8 +193,7 @@ namespace DuhnieLogo.Core.Interpreter
         private object VariableDefinition()
         {
             tokens.Eat(TokenType.Make);
-            tokens.Eat(TokenType.DoubleQuote);
-            var name = tokens.Eat(TokenType.Word);
+            var name = tokens.Eat(TokenType.StringLiteral); ;
             var value = Expression();
 
             memory.Set(name.Value, value);
@@ -203,6 +211,8 @@ namespace DuhnieLogo.Core.Interpreter
         {
             if (node is IntegerNode)
                 return ((IntegerNode)node).Value;
+            if (node is StringLiteralNode)
+                return ((StringLiteralNode)node).Value.Value;
             if (node is VariableNode)
             {
                 var variableNode = node as VariableNode;
@@ -316,10 +326,10 @@ namespace DuhnieLogo.Core.Interpreter
 
                 Node node;
 
-                if(tokens.CurrentToken.Type == TokenType.Word)
+                if(tokens.CurrentToken.Type == TokenType.Identifier)
                 {
                     // Vararg procedure call
-                    var name = tokens.Eat(TokenType.Word);
+                    var name = tokens.Eat(TokenType.Identifier);
                     var procedure = ResolveProcedure(name);
                     var argumentExpressions = new List<Node>();
                     while(tokens.CurrentToken.Type != TokenType.ParenthesisRight)
@@ -338,6 +348,7 @@ namespace DuhnieLogo.Core.Interpreter
             }
             else if (tokens.CurrentToken.Type == TokenType.BracketLeft)
             {
+                // List
                 tokens.Eat(TokenType.BracketLeft);
 
                 var values = new List<string>();
@@ -356,13 +367,18 @@ namespace DuhnieLogo.Core.Interpreter
             else if (tokens.CurrentToken.Type == TokenType.Colon)
             {
                 tokens.Eat(TokenType.Colon);
-                var variableName = tokens.Eat(TokenType.Word);
+                var variableName = tokens.Eat(TokenType.Identifier);
                 
                 return new VariableNode { Name = variableName };
             }
-            else if (tokens.CurrentToken.Type == TokenType.Word)
+            else if(tokens.CurrentToken.Type == TokenType.StringLiteral)
             {
-                var name = tokens.Eat(TokenType.Word);
+                var value = tokens.Eat(TokenType.StringLiteral);
+                return new StringLiteralNode() { Value = value };
+            }
+            else if (tokens.CurrentToken.Type == TokenType.Identifier)
+            {
+                var name = tokens.Eat(TokenType.Identifier);
                 var procedure = ResolveProcedure(name);
                 var argumentExpressions = new List<Node>();
                 for(int i=0; i<procedure.Arguments.Length; i++)

@@ -18,7 +18,11 @@ namespace DuhnieLogo.Core.Tokens
             {
                 char character = reader.PeekCharacter().Value;
 
-                if (character == '+')
+                if (character == '~')
+                {
+                    reader.ReadCharacter();
+                }
+                else if (character == '+')
                 {
                     tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Plus));
                 }
@@ -57,7 +61,7 @@ namespace DuhnieLogo.Core.Tokens
                 }
                 else if (character == '"')
                 {
-                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.DoubleQuote));
+                    tokens.Add(ParseStringLiteral(reader));
                 }
                 else if (character == ':')
                 {
@@ -92,6 +96,34 @@ namespace DuhnieLogo.Core.Tokens
             tokens.Add(new Token (TokenType.ProgramEnd, "", reader.CurrentPosition));
 
             return tokens;
+        }
+
+        private static Token ParseStringLiteral(CharacterReader reader)
+        {
+            reader.ReadCharacter();
+            var position = reader.CurrentPosition;
+
+            var buffer = new StringBuilder();
+
+            while(true)
+            {
+                var character = reader.PeekCharacter().Value;
+
+                if(Char.IsLetterOrDigit(character) || character == '\\')
+                {
+                    if (Char.IsLetterOrDigit(character))
+                        buffer.Append(reader.ReadCharacter());
+                    if(character == '\\')
+                    {
+                        reader.ReadCharacter();
+                        buffer.Append(reader.ReadCharacter());
+                    }
+                }
+                else
+                {
+                    return new Token(TokenType.StringLiteral, buffer.ToString(), position);
+                }
+            }
         }
 
         private static Token ReadCharacterAndCreateToken(CharacterReader reader, TokenType type)
@@ -137,7 +169,7 @@ namespace DuhnieLogo.Core.Tokens
                     if (value == "stop")
                         return new Token(TokenType.Stop, value, position);
 
-                    return new Token(TokenType.Word, value, position);
+                    return new Token(TokenType.Identifier, value, position);
                 }
             }
         }

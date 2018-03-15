@@ -28,11 +28,9 @@ namespace DuhnieLogo.Core.Tokens
     public enum TokenType
     {
         Identifier,
-        Word,
         Integer,
         StringLiteral,
         Comma,
-        DoubleQuote,
 
         Var,
         If,
@@ -50,7 +48,6 @@ namespace DuhnieLogo.Core.Tokens
         ParenthesisRight,
         BracketLeft,
         BracketRight,
-        StringEscape,
 
         Colon,
         Semicolon,
