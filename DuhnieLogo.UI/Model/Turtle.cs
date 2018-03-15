@@ -9,16 +9,15 @@ namespace DuhnieLogo.UI.Model
 {
     class Turtle
     {
-        public Turtle()
+        public Turtle(string name)
         {
+            Name = name;
             RecreatePen();
         }
 
         public Graphics GraphicsContext { get; set; }
 
-        public Bitmap BufferBitmap { get; set; }
-        public Graphics BufferContext { get; set; }
-
+        public string Name { get; set; }
         public Image Image { get; set; }
         public Point Location { get; set; }
         public int Orientation { get; set; }
@@ -72,7 +71,7 @@ namespace DuhnieLogo.UI.Model
             var oldLocation = Location.Clone();
 
             if(PenDown)
-                BufferContext.DrawLine(pen, Location.X, Location.Y, x, y);
+                GraphicsContext.DrawLine(pen, Location.X, Location.Y, x, y);
 
             Location.X = x;
             Location.Y = y;
@@ -82,21 +81,6 @@ namespace DuhnieLogo.UI.Model
                 X = (int)Math.Ceiling(Math.Min(oldLocation.X, Location.X)) - 1,
                 Y = (int)Math.Ceiling(Math.Min(oldLocation.Y, Location.Y)) - 1
             };
-
-            //updateRectangle.Width = 2 + (int)Math.Ceiling(Math.Max(oldLocation.X, Location.X)) - updateRectangle.X;
-            //updateRectangle.Height = 2 + (int)Math.Ceiling(Math.Max(oldLocation.Y, Location.Y)) - updateRectangle.Y;
-
-            //// Copy the modified bit of the drawing buffer
-            //GraphicsContext.DrawImage(BufferBitmap, updateRectangle, updateRectangle, GraphicsUnit.Pixel);
-
-            //// Replace the area where the turtle image was
-            //GraphicsContext.DrawImage(BufferBitmap,
-            //    new Rectangle((int)oldLocation.X - (Image.Width / 2), (int)oldLocation.Y - (Image.Height / 2), Image.Width, Image.Height),
-            //    new Rectangle((int)oldLocation.X - (Image.Width / 2), (int)oldLocation.Y - (Image.Height / 2), Image.Width, Image.Height),
-            //    GraphicsUnit.Pixel);
-
-            //// Draw the turtle in the new location
-            //GraphicsContext.DrawImage(Image, (int) Location.X - (Image.Width / 2), (int) Location.Y - (Image.Height / 2));
         }
 
         public void Left(int steps)
@@ -112,6 +96,16 @@ namespace DuhnieLogo.UI.Model
         private double ToRadians(double angle)
         {
             return (Math.PI / 180) * angle;
+        }
+
+        public void Print(string text)
+        {
+            GraphicsContext.TranslateTransform((int) Location.X, (int) Location.Y);
+            GraphicsContext.RotateTransform(Orientation);
+
+            GraphicsContext.DrawString(text, SystemFonts.DefaultFont, Brushes.Black, 0, 0);
+
+            GraphicsContext.ResetTransform();
         }
     }
 }
