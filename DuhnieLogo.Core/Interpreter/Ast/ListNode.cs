@@ -8,6 +8,6 @@ namespace DuhnieLogo.Core.Interpreter.Ast
 {
     class ListNode : Node
     {
-        public List<string> Values { get; set; }
+        public ListVariable Values { get; set; }
     }
 }

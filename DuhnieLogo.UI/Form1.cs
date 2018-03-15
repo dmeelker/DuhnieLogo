@@ -169,8 +169,8 @@ namespace DuhnieLogo.UI
 
                 foreach (var arg in _arguments)
                 {
-                    if (arg is List<string>)
-                        stringBuilder.Append(string.Join(" ", arg as List<string>));
+                    if (arg is ListVariable)
+                        stringBuilder.Append(string.Join(" ", arg as ListVariable));
                     else
                         stringBuilder.Append(arg.ToString());
                 }
@@ -191,7 +191,7 @@ namespace DuhnieLogo.UI
                     Image = Image.FromFile("images/turtle.png")
                 };
 
-                var options = _arguments[1] as List<string>;
+                var options = _arguments[1] as ListVariable;
                 if(options.Count >= 3)
                 {
                     turtle.Location.X = Convert.ToInt32(options[0]);
@@ -208,9 +208,9 @@ namespace DuhnieLogo.UI
             {
                 activeTurtles.Clear();
 
-                if(_arguments[0] is List<string>)
+                if(_arguments[0] is ListVariable)
                 {
-                    foreach(var name in _arguments[0] as List<string>)
+                    foreach(var name in _arguments[0] as ListVariable)
                     {
                         var turtle = turtleIndex[name];
                         ActivateTurtle(turtle);
@@ -276,7 +276,7 @@ namespace DuhnieLogo.UI
 
             interpreter.RegisterFunction("zetpenkleur", new string[] { "kleur" }, (_memorySpace, _arguments) =>
             {
-                var values = (List<string>)_arguments[0];
+                var values = (ListVariable)_arguments[0];
 
                 foreach (var turtle in activeTurtles)
                     turtle.PenColor = Color.FromArgb(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToInt32(values[2]));
@@ -295,8 +295,8 @@ namespace DuhnieLogo.UI
 
                 foreach (var arg in _arguments)
                 {
-                    if (arg is List<string>)
-                        stringBuilder.Append(string.Join(" ", arg as List<string>));
+                    if (arg is ListVariable)
+                        stringBuilder.Append(string.Join(" ", arg as ListVariable));
                     else
                         stringBuilder.Append(arg.ToString());
                 }

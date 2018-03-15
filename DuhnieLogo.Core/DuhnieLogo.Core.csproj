@@ -50,6 +50,7 @@
     <Compile Include="Interpreter\BuiltInProcedure.cs" />
     <Compile Include="Interpreter\Interpreter.cs" />
     <Compile Include="Interpreter\CustomProcedureInfo.cs" />
+    <Compile Include="Interpreter\ListVariable.cs" />
     <Compile Include="Interpreter\MemorySpace.cs" />
     <Compile Include="Interpreter\ProcedureInfo.cs" />
     <Compile Include="Interpreter\ReturnException.cs" />

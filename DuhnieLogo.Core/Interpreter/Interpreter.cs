@@ -27,7 +27,7 @@ namespace DuhnieLogo.Core.Interpreter
                 var memorySpace = new MemorySpace(memory);
                 PushMemorySpace(memorySpace);
 
-                var tokens = Lexer.Tokenize(string.Join(" ", (List<string>)_arguments[1])).ToArray();
+                var tokens = Lexer.Tokenize(string.Join(" ", (ListVariable)_arguments[1])).ToArray();
 
                 for(int i=0; i<(int) _arguments[0]; i++)
                 {
@@ -48,12 +48,27 @@ namespace DuhnieLogo.Core.Interpreter
             });
 
             RegisterFunction("lijst", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
-                var result = new List<string>();
+                var result = new ListVariable();
 
                 foreach (var arg in _arguments)
                     result.Add(arg.ToString());
 
                 return result;
+            });
+
+            RegisterFunction("plaatserachter", new string[] { "element", "toevoegsel" }, (_globalMemory, _arguments) => {
+                var target = _arguments[1];
+                var addition = _arguments[0];
+
+                if(target is ListVariable)
+                {
+                    var newList = new ListVariable((target as ListVariable));
+
+                    newList.Add(addition.ToString());
+                    return newList;
+                }
+
+                return null;
             });
 
             RegisterFunction("woord", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
@@ -155,7 +170,7 @@ namespace DuhnieLogo.Core.Interpreter
             
             procedureInfo.Name = tokens.Eat(TokenType.Identifier).Value;
 
-            var arguments = new List<string>();
+            var arguments = new ListVariable();
             while(tokens.CurrentToken.Type == TokenType.Colon)
             {
                 tokens.Eat(TokenType.Colon);
@@ -351,7 +366,7 @@ namespace DuhnieLogo.Core.Interpreter
                 // List
                 tokens.Eat(TokenType.BracketLeft);
 
-                var values = new List<string>();
+                var values = new ListVariable();
                 while(tokens.CurrentToken.Type != TokenType.BracketRight)
                     values.Add(tokens.Eat().LiteralValue);
 
