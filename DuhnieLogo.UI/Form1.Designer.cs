@@ -97,6 +97,7 @@
             this.panViewport.Name = "panViewport";
             this.panViewport.Size = new System.Drawing.Size(588, 450);
             this.panViewport.TabIndex = 0;
+            this.panViewport.Resize += new System.EventHandler(this.panViewport_Resize);
             // 
             // txtOutput
             // 

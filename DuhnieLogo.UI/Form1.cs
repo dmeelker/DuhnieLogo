@@ -8,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,6 +19,8 @@ namespace DuhnieLogo.UI
         public Form1()
         {
             InitializeComponent();
+
+            drawTimer.Elapsed += DrawTimer_Elapsed;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -35,21 +38,67 @@ namespace DuhnieLogo.UI
 
         }
 
+        private BufferedGraphicsContext bufferedGraphicsContext = new BufferedGraphicsContext();
+        private BufferedGraphics bufferedGraphics;
+
+        private System.Timers.Timer drawTimer = new System.Timers.Timer(10);
+        private Bitmap drawingImage;
+        private Turtle turtle;
+        private readonly object bufferLock = new object();
+
+        private void RecreateBuffer()
+        {
+            lock (bufferLock)
+            {
+                if (bufferedGraphics != null)
+                {
+                    bufferedGraphics.Graphics.Dispose();
+                    bufferedGraphics.Dispose();
+                }
+                bufferedGraphics = bufferedGraphicsContext.Allocate(panViewport.CreateGraphics(), panViewport.DisplayRectangle);
+            }
+        }
+        
+        private void DrawTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            DrawViewport();
+        }
+
+        private void DrawViewport()
+        {
+            lock (bufferLock)
+            {
+                if (bufferedGraphics == null)
+                    RecreateBuffer();
+
+                var g = bufferedGraphics.Graphics;
+                g.DrawImageUnscaled(drawingImage, 0, 0);
+
+                g.TranslateTransform((int)turtle.Location.X , (int)turtle.Location.Y );
+                g.RotateTransform(turtle.Orientation);
+
+                g.DrawImageUnscaled(turtle.Image, -(turtle.Image.Width / 2), -turtle.Image.Height);
+                g.ResetTransform();
+
+                bufferedGraphics.Render();
+            }
+        }
+
         private void btnRun_Click(object sender, EventArgs e)
         {
-            var buffer = new Bitmap(panViewport.Width, panViewport.Height);
+            drawingImage = new Bitmap(panViewport.Width, panViewport.Height);
 
             using (var g = panViewport.CreateGraphics())
-            using(var bufferG = Graphics.FromImage(buffer))
+            using(var bufferG = Graphics.FromImage(drawingImage))
             {
                 g.Clear(Color.White);
                 bufferG.Clear(Color.White);
                 ClearConsole();
 
                 var tokens = Lexer.Tokenize(txtInput.Text).ToArray();
-                var turtle = new Turtle() {
+                turtle = new Turtle() {
                     GraphicsContext = g,
-                    BufferBitmap = buffer,
+                    BufferBitmap = drawingImage,
                     BufferContext = bufferG,
                     Location = new Model.Point(panViewport.Width / 2, panViewport.Height / 2),
                     Image = Image.FromFile("images/turtle.png")
@@ -121,6 +170,8 @@ namespace DuhnieLogo.UI
                     return null;
                 });
 
+                drawTimer.Start();
+
                 //try
                 //{
                     interpreter.Interpret(tokens);
@@ -136,6 +187,9 @@ namespace DuhnieLogo.UI
                 //{
                 //    WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
                 //}
+
+                drawTimer.Stop();
+                DrawViewport();
             }
         }
 
@@ -150,6 +204,11 @@ namespace DuhnieLogo.UI
                 txtOutput.AppendText(Environment.NewLine);
 
             txtOutput.AppendText(message);
+        }
+
+        private void panViewport_Resize(object sender, EventArgs e)
+        {
+            RecreateBuffer();
         }
     }
 }

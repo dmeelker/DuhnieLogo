@@ -83,20 +83,20 @@ namespace DuhnieLogo.UI.Model
                 Y = (int)Math.Ceiling(Math.Min(oldLocation.Y, Location.Y)) - 1
             };
 
-            updateRectangle.Width = 2 + (int)Math.Ceiling(Math.Max(oldLocation.X, Location.X)) - updateRectangle.X;
-            updateRectangle.Height = 2 + (int)Math.Ceiling(Math.Max(oldLocation.Y, Location.Y)) - updateRectangle.Y;
+            //updateRectangle.Width = 2 + (int)Math.Ceiling(Math.Max(oldLocation.X, Location.X)) - updateRectangle.X;
+            //updateRectangle.Height = 2 + (int)Math.Ceiling(Math.Max(oldLocation.Y, Location.Y)) - updateRectangle.Y;
 
-            // Copy the modified bit of the drawing buffer
-            GraphicsContext.DrawImage(BufferBitmap, updateRectangle, updateRectangle, GraphicsUnit.Pixel);
+            //// Copy the modified bit of the drawing buffer
+            //GraphicsContext.DrawImage(BufferBitmap, updateRectangle, updateRectangle, GraphicsUnit.Pixel);
 
-            // Replace the area where the turtle image was
-            GraphicsContext.DrawImage(BufferBitmap,
-                new Rectangle((int)oldLocation.X, (int)oldLocation.Y, Image.Width, Image.Height),
-                new Rectangle((int)oldLocation.X, (int)oldLocation.Y, Image.Width, Image.Height),
-                GraphicsUnit.Pixel);
+            //// Replace the area where the turtle image was
+            //GraphicsContext.DrawImage(BufferBitmap,
+            //    new Rectangle((int)oldLocation.X - (Image.Width / 2), (int)oldLocation.Y - (Image.Height / 2), Image.Width, Image.Height),
+            //    new Rectangle((int)oldLocation.X - (Image.Width / 2), (int)oldLocation.Y - (Image.Height / 2), Image.Width, Image.Height),
+            //    GraphicsUnit.Pixel);
 
-            // Draw the turtle in the new location
-            GraphicsContext.DrawImage(Image, (int) Location.X, (int) Location.Y);
+            //// Draw the turtle in the new location
+            //GraphicsContext.DrawImage(Image, (int) Location.X - (Image.Width / 2), (int) Location.Y - (Image.Height / 2));
         }
 
         public void Left(int steps)
