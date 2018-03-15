@@ -353,7 +353,7 @@ namespace DuhnieLogo.Core.Interpreter
 
                 var values = new List<string>();
                 while(tokens.CurrentToken.Type != TokenType.BracketRight)
-                    values.Add(tokens.Eat().Value);
+                    values.Add(tokens.Eat().LiteralValue);
 
                 tokens.Eat(TokenType.BracketRight);
 

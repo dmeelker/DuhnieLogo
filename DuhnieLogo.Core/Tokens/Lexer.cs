@@ -104,24 +104,32 @@ namespace DuhnieLogo.Core.Tokens
             var position = reader.CurrentPosition;
 
             var buffer = new StringBuilder();
+            var literalBuffer = new StringBuilder();
+            literalBuffer.Append('"');
 
-            while(true)
+            while (true)
             {
                 var character = reader.PeekCharacter().Value;
 
                 if(Char.IsLetterOrDigit(character) || character == '\\')
                 {
+                    literalBuffer.Append(character);
                     if (Char.IsLetterOrDigit(character))
+                    {
                         buffer.Append(reader.ReadCharacter());
-                    if(character == '\\')
+                    }
+                    else if(character == '\\')
                     {
                         reader.ReadCharacter();
-                        buffer.Append(reader.ReadCharacter());
+
+                        character = reader.ReadCharacter().Value;
+                        buffer.Append(character);
+                        literalBuffer.Append(character);
                     }
                 }
                 else
                 {
-                    return new Token(TokenType.StringLiteral, buffer.ToString(), position);
+                    return new Token(TokenType.StringLiteral, buffer.ToString(), literalBuffer.ToString(), position);
                 }
             }
         }

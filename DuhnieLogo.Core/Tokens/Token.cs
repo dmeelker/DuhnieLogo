@@ -10,12 +10,18 @@ namespace DuhnieLogo.Core.Tokens
     {
         public TokenType Type { get; set; }
         public string Value { get; set; }
+        public string LiteralValue { get; set; }
         public TokenPosition Location { get; set; }
 
-        public Token(TokenType type, string value, TokenPosition location)
+        public Token(TokenType type, string value, TokenPosition location) : this(type, value, value, location)
+        {
+        }
+
+        public Token(TokenType type, string value, string literalValue, TokenPosition location)
         {
             Type = type;
             Value = value;
+            LiteralValue = literalValue;
             Location = location;
         }
 
