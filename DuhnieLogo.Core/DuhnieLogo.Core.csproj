@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interpreter\Ast\BinaryOperatorNode.cs" />
+    <Compile Include="Interpreter\Ast\BooleanNode.cs" />
     <Compile Include="Interpreter\Ast\IntegerNode.cs" />
     <Compile Include="Interpreter\Ast\ListNode.cs" />
     <Compile Include="Interpreter\Ast\Node.cs" />

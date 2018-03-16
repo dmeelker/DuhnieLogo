@@ -42,6 +42,9 @@ namespace DuhnieLogo.Core.Tokens
         If,
         Else,
 
+        True,
+        False,
+
         LogicalAnd,
         LogicalOr,
         Equals,

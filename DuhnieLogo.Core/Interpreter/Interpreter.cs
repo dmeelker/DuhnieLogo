@@ -47,6 +47,72 @@ namespace DuhnieLogo.Core.Interpreter
                 return memory.Get("iteratie");
             });
 
+            RegisterFunction("als", new string[] { "conditie", "alsWelwaar", "alsNietwaar" }, (_globalMemory, _arguments) => {
+                var boolean = Convert.ToBoolean(_arguments[0]);
+
+                if (_arguments[1] is ListVariable && _arguments[2] is ListVariable)
+                {
+                    var trueTokens = _arguments[1] as ListVariable;
+                    var falseTokens = _arguments[2] as ListVariable;
+
+                    var memorySpace = new MemorySpace(memory);
+                    PushMemorySpace(memorySpace);
+
+                    var tokens = Lexer.Tokenize(string.Join(" ", boolean ? trueTokens : falseTokens)).ToArray();
+                    Interpret(tokens);
+
+                    PopMemorySpace();
+                    return null;
+                }
+                else
+                {
+                    return boolean ? _arguments[1] : _arguments[2];
+                }
+            });
+
+            RegisterFunction("test", new string[] { "conditie" }, (_globalMemory, _arguments) => {
+                var boolean = Convert.ToBoolean(_arguments[0]);
+
+                memory.Set("testResultaat", boolean);
+                return null;
+            });
+
+            RegisterFunction("alswaar", new string[] { "instructies" }, (_globalMemory, _arguments) => {
+                if (!memory.Contains("testResultaat"))
+                    throw new ScriptException("Alswaar kan alleen na een aanroep van test gebruikt worden");
+
+                if (Convert.ToBoolean(memory.Get("testResultaat")))
+                {
+                    var memorySpace = new MemorySpace(memory);
+                    PushMemorySpace(memorySpace);
+
+                    var tokens = Lexer.Tokenize(string.Join(" ", _arguments[0] as ListVariable)).ToArray();
+                    Interpret(tokens);
+
+                    PopMemorySpace();
+                }
+
+                return null;
+            });
+
+            RegisterFunction("alsnietwaar", new string[] { "instructies" }, (_globalMemory, _arguments) => {
+                if (!memory.Contains("testResultaat"))
+                    throw new ScriptException("Alsnietwaar kan alleen na een aanroep van test gebruikt worden");
+
+                if (!Convert.ToBoolean(memory.Get("testResultaat")))
+                {
+                    var memorySpace = new MemorySpace(memory);
+                    PushMemorySpace(memorySpace);
+
+                    var tokens = Lexer.Tokenize(string.Join(" ", _arguments[0] as ListVariable)).ToArray();
+                    Interpret(tokens);
+
+                    PopMemorySpace();
+                }
+
+                return null;
+            });
+
             RegisterFunction("lijst", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
                 var result = new ListVariable();
 
@@ -226,6 +292,8 @@ namespace DuhnieLogo.Core.Interpreter
         {
             if (node is IntegerNode)
                 return ((IntegerNode)node).Value;
+            if (node is BooleanNode)
+                return ((BooleanNode)node).Value;
             if (node is StringLiteralNode)
                 return ((StringLiteralNode)node).Value.Value;
             if (node is VariableNode)
@@ -378,6 +446,11 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var token = tokens.Eat(TokenType.Integer);
                 return new IntegerNode { Value = Convert.ToInt32(token.Value) };
+            }
+            else if (tokens.CurrentToken.Type == TokenType.True || tokens.CurrentToken.Type == TokenType.False)
+            {
+                var token = tokens.Eat();
+                return new BooleanNode { Value = token.Value.Equals("welwaar", StringComparison.CurrentCultureIgnoreCase) };
             }
             else if (tokens.CurrentToken.Type == TokenType.Colon)
             {

@@ -165,6 +165,12 @@ namespace DuhnieLogo.Core.Tokens
                     if (value == "maak" || value == "naam")
                         return new Token(TokenType.Make, value, position);
 
+                    if (value == "welwaar")
+                        return new Token(TokenType.True, value, position);
+
+                    if (value == "nietwaar")
+                        return new Token(TokenType.False, value, position);
+
                     if (value == "leer")
                         return new Token(TokenType.Learn, value, position);
 
