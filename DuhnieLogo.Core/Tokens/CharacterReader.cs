@@ -12,8 +12,8 @@ namespace DuhnieLogo.Core.Tokens
         private int currentIndex;
         public int CurrentRow { get; private set; }
         public int CurrentColumn { get; private set; }
-
-        public TokenPosition CurrentPosition => new TokenPosition(CurrentRow, CurrentColumn);
+        
+        public TokenPosition CurrentPosition => new TokenPosition(CurrentRow, CurrentColumn, currentIndex);
 
         public CharacterReader(string input)
         {

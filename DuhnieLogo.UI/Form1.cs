@@ -1,6 +1,7 @@
 ﻿using DuhnieLogo.Core.Interpreter;
 using DuhnieLogo.Core.Tokens;
 using DuhnieLogo.UI.Model;
+using ScintillaNET;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,6 +41,8 @@ namespace DuhnieLogo.UI
 
         private BufferedGraphicsContext bufferedGraphicsContext = new BufferedGraphicsContext();
         private BufferedGraphics bufferedGraphics;
+
+        private Scintilla sourceField;
 
         private System.Timers.Timer drawTimer = new System.Timers.Timer(10);
         private Bitmap drawingImage;
@@ -133,7 +136,7 @@ namespace DuhnieLogo.UI
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += Worker_DoWork;
             worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            worker.RunWorkerAsync();
+            worker.RunWorkerAsync(sourceField.Text);
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -149,10 +152,10 @@ namespace DuhnieLogo.UI
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            RunScript();
+            RunScript(e.Argument as string);
         }
 
-        private void RunScript()
+        private void RunScript(string script)
         {
             drawingImage = new Bitmap(panViewport.Width, panViewport.Height);
 
@@ -162,7 +165,7 @@ namespace DuhnieLogo.UI
                 g.Clear(Color.White);
                 bufferG.Clear(Color.White);
                 
-                var tokens = Lexer.Tokenize(txtInput.Text).ToArray();
+                var tokens = Core.Tokens.Lexer.Tokenize(script).ToArray();
 
                 var mainTurtle = new Turtle("0")
                 {
@@ -199,13 +202,13 @@ namespace DuhnieLogo.UI
 
         private void EnableRunningMode()
         {
-            txtInput.Enabled = false;
+            sourceField.Enabled = false;
             btnRun.Enabled = false;
         }
 
         private void DisableRunningMode()
         {
-            txtInput.Enabled = true;
+            sourceField.Enabled = true;
             btnRun.Enabled = true;
         }
 
@@ -444,6 +447,96 @@ namespace DuhnieLogo.UI
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             inputProvider.KeyDown(e.KeyCode);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            sourceField = new Scintilla();
+            panEditor.Controls.Add(sourceField);
+
+            sourceField.Dock = DockStyle.Fill;
+
+            var nums = sourceField.Margins[1];
+            nums.Width = 30;
+            nums.Type = MarginType.Number;
+            nums.Sensitive = true;
+            nums.Mask = 0;
+
+            sourceField.StyleResetDefault();
+            sourceField.Styles[Style.Default].Font = "Consolas";
+            sourceField.Styles[Style.Default].Size = 10;
+
+            SetupHighlighting();
+        }
+
+        private const int STYLE_KEYWORD = 1;
+        private const int STYLE_IDENTIFIER = 2;
+        private const int STYLE_STRINGLITERAL = 3;
+
+        private void SetupHighlighting()
+        {
+            sourceField.Lexer = ScintillaNET.Lexer.Container;
+
+            sourceField.Styles[STYLE_KEYWORD].ForeColor = Color.Blue;
+            sourceField.Styles[STYLE_IDENTIFIER].ForeColor = Color.Green;
+            sourceField.Styles[STYLE_STRINGLITERAL].ForeColor = Color.Red;
+
+            sourceField.StyleNeeded += SourceField_StyleNeeded;
+        }
+
+        private void SourceField_StyleNeeded(object sender, StyleNeededEventArgs e)
+        {
+            StyleSyntax(e);
+        }
+
+        private void StyleSyntax(StyleNeededEventArgs e)
+        {
+            var fromIndex = sourceField.GetEndStyled();
+            var toIndex = e.Position;
+
+            try
+            {
+                var tokens = Core.Tokens.Lexer.Tokenize(sourceField.GetTextRange(fromIndex, toIndex - fromIndex));
+
+                foreach (var token in tokens)
+                {
+                    var location = token.Location.Character + fromIndex;
+
+                    if (IsKeyword(token))
+                    {
+                        sourceField.StartStyling(location);
+                        sourceField.SetStyling(token.LiteralValue.Length, STYLE_KEYWORD);
+                    }
+                    if (token.Type == TokenType.Identifier)
+                    {
+                        sourceField.StartStyling(location);
+                        sourceField.SetStyling(token.LiteralValue.Length, STYLE_IDENTIFIER);
+                    }
+                    if (token.Type == TokenType.StringLiteral)
+                    {
+                        sourceField.StartStyling(location);
+                        sourceField.SetStyling(token.LiteralValue.Length, STYLE_STRINGLITERAL);
+                    }
+
+
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+        }
+
+        private bool IsKeyword(Token token)
+        {
+            return
+                token.Type == TokenType.Learn ||
+                token.Type == TokenType.End ||
+                token.Type == TokenType.Make ||
+                token.Type == TokenType.Local ||
+                token.Type == TokenType.True ||
+                token.Type == TokenType.False;
         }
     }
 }

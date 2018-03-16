@@ -10,11 +10,13 @@ namespace DuhnieLogo.Core.Tokens
     {
         public int Row { get; private set; }
         public int Column { get; private set; }
+        public int Character { get; private set; }
 
-        public TokenPosition(int row, int column)
+        public TokenPosition(int row, int column, int character)
         {
             Row = row;
             Column = column;
+            Character = character;
         }
     }
 }

@@ -2,3 +2,4 @@ obj
 bin
 /.vs/DuhnieLogo/v15
 /DuhnieLogo.UI/*.user
+/packages

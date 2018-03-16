@@ -117,34 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="txtInput.Text" xml:space="preserve">
-    <value>leer RandomKleur
- maak "r gok 256
- maak "g gok 256
- maak "b gok 256
- zetpenkleur (lijst :r :g :b)
-eind
-
-leer Cirkel :grootte
- herhaal 360 [vooruit :grootte rechts 1]
-eind
-
-leer Vierkant :grootte
- herhaal 4 [vooruit :grootte rechts 90]
-eind
-
-zetpendikte 2
-herhaal 30 [RandomKleur Cirkel 2 rechts 360/30]
-
-wacht 2000
-wistekening
-
-zetpendikte 5
-herhaal 30 [RandomKleur Vierkant 50 rechts 360/30 wacht 1]
-herhaal 30 [RandomKleur Vierkant 100 rechts 360/30 wacht 1]
-herhaal 30 [RandomKleur Vierkant 150 rechts 360/30 wacht 1]
-herhaal 30 [RandomKleur Vierkant 200 rechts 360/30 wacht 1]
-herhaal 30 [RandomKleur Vierkant 250 rechts 360/30 wacht 1]
-herhaal 30 [RandomKleur Vierkant 300 rechts 360/30 wacht 1]</value>
-  </data>
 </root>

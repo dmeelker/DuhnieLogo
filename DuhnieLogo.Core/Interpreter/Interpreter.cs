@@ -291,7 +291,7 @@ namespace DuhnieLogo.Core.Interpreter
             while (tokens.CurrentToken.Type != TokenType.End)
                 procTokens.Add(tokens.Eat());
 
-            procTokens.Add(new Token(TokenType.ProgramEnd, "", new TokenPosition(0, 0)));
+            procTokens.Add(new Token(TokenType.ProgramEnd, "", new TokenPosition(0, 0, 0)));
 
             tokens.Eat(TokenType.End);
             procedureInfo.Tokens = procTokens.ToArray();

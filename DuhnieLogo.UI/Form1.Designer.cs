@@ -28,35 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.txtInput = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnRun = new System.Windows.Forms.Button();
             this.panViewport = new System.Windows.Forms.Panel();
             this.txtOutput = new System.Windows.Forms.TextBox();
+            this.panEditor = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panViewport.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // txtInput
-            // 
-            this.txtInput.AcceptsReturn = true;
-            this.txtInput.AcceptsTab = true;
-            this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtInput.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtInput.Location = new System.Drawing.Point(12, 12);
-            this.txtInput.Multiline = true;
-            this.txtInput.Name = "txtInput";
-            this.txtInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtInput.Size = new System.Drawing.Size(557, 397);
-            this.txtInput.TabIndex = 0;
-            this.txtInput.Text = resources.GetString("txtInput.Text");
-            this.txtInput.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // splitContainer1
             // 
@@ -66,8 +48,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.panEditor);
             this.splitContainer1.Panel1.Controls.Add(this.btnRun);
-            this.splitContainer1.Panel1.Controls.Add(this.txtInput);
             this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
             // 
             // splitContainer1.Panel2
@@ -80,7 +62,7 @@
             // btnRun
             // 
             this.btnRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRun.Location = new System.Drawing.Point(494, 415);
+            this.btnRun.Location = new System.Drawing.Point(504, 424);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(75, 23);
             this.btnRun.TabIndex = 1;
@@ -112,6 +94,16 @@
             this.txtOutput.Size = new System.Drawing.Size(588, 102);
             this.txtOutput.TabIndex = 0;
             // 
+            // panEditor
+            // 
+            this.panEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panEditor.Location = new System.Drawing.Point(3, 3);
+            this.panEditor.Name = "panEditor";
+            this.panEditor.Size = new System.Drawing.Size(577, 415);
+            this.panEditor.TabIndex = 2;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -121,9 +113,9 @@
             this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "SuperDuperLogo";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
@@ -134,12 +126,11 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox txtInput;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnRun;
         private System.Windows.Forms.Panel panViewport;
         private System.Windows.Forms.TextBox txtOutput;
+        private System.Windows.Forms.Panel panEditor;
     }
 }
 
