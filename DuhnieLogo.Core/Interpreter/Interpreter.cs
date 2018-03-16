@@ -41,7 +41,7 @@ namespace DuhnieLogo.Core.Interpreter
             });
 
             RegisterFunction("telherhaal", new string[] {}, (_globalMemory, _arguments) => {
-                if (!memory.Contains("iteratie"))
+                if (!memory.ContainsRecursive("iteratie"))
                     throw new ScriptException("Telherhaal kan alleen binnen een herhaal opdracht gebruikt worden");
 
                 return memory.Get("iteratie");
@@ -90,7 +90,7 @@ namespace DuhnieLogo.Core.Interpreter
             });
 
             RegisterFunction("alswaar", new string[] { "instructies" }, (_globalMemory, _arguments) => {
-                if (!memory.Contains("testResultaat"))
+                if (!memory.ContainsRecursive("testResultaat"))
                     throw new ScriptException("Alswaar kan alleen na een aanroep van test gebruikt worden");
 
                 if (Convert.ToBoolean(memory.Get("testResultaat")))
@@ -108,7 +108,7 @@ namespace DuhnieLogo.Core.Interpreter
             });
 
             RegisterFunction("alsnietwaar", new string[] { "instructies" }, (_globalMemory, _arguments) => {
-                if (!memory.Contains("testResultaat"))
+                if (!memory.ContainsRecursive("testResultaat"))
                     throw new ScriptException("Alsnietwaar kan alleen na een aanroep van test gebruikt worden");
 
                 if (!Convert.ToBoolean(memory.Get("testResultaat")))
@@ -196,7 +196,7 @@ namespace DuhnieLogo.Core.Interpreter
 
         private void PopMemorySpace()
         {
-            this.memory = memoryStack.Pop();
+            memory = memoryStack.Pop();
         }
 
         public object Interpret(Token[] tokens)
@@ -227,6 +227,8 @@ namespace DuhnieLogo.Core.Interpreter
         {
             if (tokens.CurrentToken.Type == TokenType.Make)
                 return VariableDefinition();
+            else if (tokens.CurrentToken.Type == TokenType.Local)
+                return LocalVariableDefinition();
             else if (tokens.CurrentToken.Type == TokenType.Learn)
             {
                 ProcedureDeclaration();
@@ -283,13 +285,31 @@ namespace DuhnieLogo.Core.Interpreter
             throw new ReturnException();
         }
 
+        private object LocalVariableDefinition()
+        {
+            var token = tokens.Eat(TokenType.Local);
+            var name = tokens.Eat(TokenType.StringLiteral);
+
+            if (memory == globalMemory)
+                throw new ScriptException("Lokale variabelen kunnen alleen binnnen procedures gemaakt worden", token);
+
+            memory.Set(name.Value, null);
+
+            return null;
+        }
+
         private object VariableDefinition()
         {
             tokens.Eat(TokenType.Make);
-            var name = tokens.Eat(TokenType.StringLiteral); ;
+            var name = tokens.Eat(TokenType.StringLiteral);
             var value = Expression();
 
-            memory.Set(name.Value, value);
+            // If exists in local scope, update value, else create in global scope
+            if(memory.ContainsLocal(name.Value))
+                memory.Set(name.Value, value);
+            else
+                globalMemory.Set(name.Value, value);
+
             return value;
         }
 
@@ -311,7 +331,7 @@ namespace DuhnieLogo.Core.Interpreter
             if (node is VariableNode)
             {
                 var variableNode = node as VariableNode;
-                if (memory.Contains(variableNode.Name.Value))
+                if (memory.ContainsRecursive(variableNode.Name.Value))
                     return memory.Get(variableNode.Name.Value);
                 else
                     throw new ScriptException($"Onbekende variabele '{variableNode.Name.Value}'", variableNode.Name);

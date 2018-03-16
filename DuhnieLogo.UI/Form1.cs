@@ -140,21 +140,21 @@ namespace DuhnieLogo.UI
 
                 drawTimer.Start();
 
-                //try
-                //{
-                interpreter.Interpret(tokens);
-                //}
-                //catch(ScriptException ex)
-                //{
-                //    if(ex.Token != null)
-                //        WriteToConsole($"Er is een fout opgetreden: {ex.Message} (Regel: {ex.Token.Location.Row + 1}, Teken: {ex.Token.Location.Column + 1})");
-                //    else
-                //        WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
-                //}
-                //catch (Exception ex)
-                //{
-                //    WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
-                //}
+                try
+                {
+                    interpreter.Interpret(tokens);
+                }
+                catch (ScriptException ex)
+                {
+                    if (ex.Token != null)
+                        WriteToConsole($"Er is een fout opgetreden: {ex.Message} (Regel: {ex.Token.Location.Row + 1}, Teken: {ex.Token.Location.Column + 1})");
+                    else
+                        WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
+                }
 
                 drawTimer.Stop();
                 DrawViewport();

@@ -21,20 +21,31 @@ namespace DuhnieLogo.Core.Interpreter
             parentSpace = parent;
         }
 
-        public bool Contains(string key)
+        public bool ContainsLocal(string key)
         {
+            key = NormalizeKey(key);
+
+            return data.ContainsKey(key);
+        }
+
+        public bool ContainsRecursive(string key)
+        {
+            key = NormalizeKey(key);
+
             if (data.ContainsKey(key))
                 return true;
 
             if (parentSpace != null)
-                return parentSpace.Contains(key);
+                return parentSpace.ContainsRecursive(key);
 
             return false;
         }
 
         public object Get(string key)
         {
-            if(data.ContainsKey(key))
+            key = NormalizeKey(key);
+
+            if (data.ContainsKey(key))
                 return data[key];
 
             if (parentSpace != null)
@@ -45,7 +56,13 @@ namespace DuhnieLogo.Core.Interpreter
 
         public void Set(string key, object value)
         {
+            key = NormalizeKey(key);
             data[key] = value;
+        }
+
+        private string NormalizeKey(string key)
+        {
+            return key.ToLower();
         }
     }
 }

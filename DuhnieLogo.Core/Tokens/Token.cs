@@ -79,6 +79,7 @@ namespace DuhnieLogo.Core.Tokens
 
         NewLine,
 
-        Make
+        Make,
+        Local
     }
 }

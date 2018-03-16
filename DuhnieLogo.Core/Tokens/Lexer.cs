@@ -207,6 +207,9 @@ namespace DuhnieLogo.Core.Tokens
                     if (value == "maak" || value == "naam")
                         return new Token(TokenType.Make, value, position);
 
+                    if (value == "lokaal")
+                        return new Token(TokenType.Local, value, position);
+
                     if (value == "welwaar")
                         return new Token(TokenType.True, value, position);
 
