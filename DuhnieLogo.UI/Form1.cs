@@ -82,7 +82,8 @@ namespace DuhnieLogo.UI
                     if(!turtle.VariantModus)
                         g.RotateTransform(turtle.Orientation);
 
-                    g.DrawImageUnscaled(turtle.Image, -(turtle.Image.Width / 2), -turtle.Image.Height);
+                    //g.DrawImageUnscaled(turtle.Image, -(turtle.Image.Width / 2), -turtle.Image.Height);
+                    g.DrawImageUnscaled(turtle.Image, 0, 0);
                     g.ResetTransform();
                 }
 
@@ -104,7 +105,7 @@ namespace DuhnieLogo.UI
         private void RegisterTurtle(Turtle turtle)
         {
             turtles.Add(turtle);
-            turtleIndex[turtle.Name] = turtle;
+            turtleIndex[turtle.Name.ToLower()] = turtle;
             activeTurtles.Remove(turtle);
         }
 
@@ -114,6 +115,13 @@ namespace DuhnieLogo.UI
             activeTurtles.AddLast(turtle);
         }
 
+        private Turtle GetTurtle(string name)
+        {
+            if (turtleIndex.ContainsKey(name.ToLower()))
+                return turtleIndex[name.ToLower()];
+
+            throw new ScriptException($"Er bestaat geen turtle met naam '{name}'");
+        }
 
         private void btnRun_Click(object sender, EventArgs e)
         {
@@ -252,17 +260,43 @@ namespace DuhnieLogo.UI
                 {
                     foreach(var name in _arguments[0] as ListVariable)
                     {
-                        var turtle = turtleIndex[name];
+                        var turtle = GetTurtle(name);
                         ActivateTurtle(turtle);
                     }
                 }
                 else
                 {
-                    var turtle = turtleIndex[_arguments[0].ToString()];
+                    var turtle = GetTurtle(_arguments[0].ToString());
                     ActivateTurtle(turtle);
                 }
 
                 return null;
+            });
+
+            interpreter.RegisterFunction("overlap?", new string[] { "turtles" }, (_memorySpace, _arguments) =>
+            {
+                List<string> turtleNames;
+
+                if (_arguments[0] is ListVariable)
+                    turtleNames = (_arguments[0] as ListVariable);
+                else
+                    turtleNames = new List<string>() { _arguments[0].ToString() };
+
+                var activeTurtle = activeTurtles.FirstOrDefault();
+                if (activeTurtle == null)
+                    throw new ScriptException("Er is geen active turtle");
+
+                var activeTurtleBounds = activeTurtle.BoundingBox;
+
+                foreach(var name in turtleNames)
+                {
+                    var turtle = GetTurtle(name);
+
+                    if (turtle.BoundingBox.IntersectsWith(activeTurtleBounds))
+                        return true;
+                }
+
+                return false;
             });
 
             interpreter.RegisterFunction("vooruit", new string[] { "stappen" }, (_memorySpace, _arguments) =>

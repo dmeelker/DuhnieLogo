@@ -1,0 +1,54 @@
+leer Main
+ maak "stoppen nietwaar
+
+ Opbouwen
+
+ zolang [niet :stoppen] [Frame]
+eind
+
+leer Opbouwen
+ maakturtle "boef [100 100 90]
+eind
+
+leer Frame
+ Test Toets?
+ Alswaar [LeesInput]
+
+ BoefLoop
+ Botsingen
+
+ Wacht 10
+eind
+
+leer BoefLoop
+ gebruik "boef
+ vooruit 1
+
+ gebruik 0
+eind
+
+leer Botsingen
+ als (overlap? "boef) [Botsing] []
+eind
+
+leer Botsing
+ print "AUW
+eind
+
+leer LeesInput
+ lokaal "knop
+ maak "knop leestoets
+
+ als :knop = 27 [maak "stoppen welwaar] []
+ 
+ als :knop = 38 [vooruit 10] []
+ als :knop = 40 [achteruit 10] []
+ als :knop = 37 [links 10] []
+ als :knop = 39 [rechts 10] []
+
+ ; print :knop
+eind
+
+
+
+Main

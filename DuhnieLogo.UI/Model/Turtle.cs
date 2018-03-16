@@ -108,6 +108,8 @@ namespace DuhnieLogo.UI.Model
 
             GraphicsContext.ResetTransform();
         }
+
+        public Rectangle BoundingBox => new Rectangle((int) Location.X, (int) Location.Y, Image.Width, Image.Height);
     }
 }
 
