@@ -47,6 +47,18 @@ namespace DuhnieLogo.Core.Interpreter
                 return memory.Get("iteratie");
             });
 
+            RegisterFunction("en", new string[] {"aanduiding1", "aanduiding2" }, (_globalMemory, _arguments) => {
+                return _arguments.All(arg => Convert.ToBoolean(arg));
+            });
+
+            RegisterFunction("of", new string[] { "aanduiding1", "aanduiding2" }, (_globalMemory, _arguments) => {
+                return _arguments.Any(arg => Convert.ToBoolean(arg));
+            });
+
+            RegisterFunction("niet", new string[] { "aanduiding" }, (_globalMemory, _arguments) => {
+                return !Convert.ToBoolean(_arguments[0]);
+            });
+
             RegisterFunction("als", new string[] { "conditie", "alsWelwaar", "alsNietwaar" }, (_globalMemory, _arguments) => {
                 var boolean = Convert.ToBoolean(_arguments[0]);
 
