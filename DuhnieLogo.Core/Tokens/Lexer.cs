@@ -192,7 +192,7 @@ namespace DuhnieLogo.Core.Tokens
             {
                 var character = reader.PeekCharacter().Value;
 
-                if (Char.IsLetter(character) || (Char.IsNumber(character) && buffer.Length > 0))
+                if (IsIdentifierCharacter(character))
                 {
                     buffer.Append(character);
                     reader.ReadCharacter();
@@ -231,6 +231,11 @@ namespace DuhnieLogo.Core.Tokens
                     return new Token(TokenType.Identifier, value, position);
                 }
             }
+        }
+
+        private static bool IsIdentifierCharacter(char chr)
+        {
+            return Char.IsLetterOrDigit(chr) || chr == '?' || chr == '_';
         }
 
         private static Token ParseNumber(CharacterReader reader)

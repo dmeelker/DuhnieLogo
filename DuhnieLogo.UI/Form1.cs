@@ -45,6 +45,8 @@ namespace DuhnieLogo.UI
         private Bitmap drawingImage;
         private readonly object bufferLock = new object();
 
+        private readonly InputProvider inputProvider = new InputProvider();
+
         private void RecreateBuffer()
         {
             lock (bufferLock)
@@ -112,20 +114,47 @@ namespace DuhnieLogo.UI
             activeTurtles.AddLast(turtle);
         }
 
+
         private void btnRun_Click(object sender, EventArgs e)
+        {
+            EnableRunningMode();
+
+            ClearConsole();
+            ClearTurtles();
+
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += Worker_DoWork;
+            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            worker.RunWorkerAsync();
+        }
+
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+                WriteToConsole($"Onverwachte fout: {e.Error}");
+
+            drawTimer.Stop();
+            DrawViewport();
+
+            DisableRunningMode();
+        }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunScript();
+        }
+
+        private void RunScript()
         {
             drawingImage = new Bitmap(panViewport.Width, panViewport.Height);
 
             using (var g = panViewport.CreateGraphics())
-            using(var bufferG = Graphics.FromImage(drawingImage))
+            using (var bufferG = Graphics.FromImage(drawingImage))
             {
                 g.Clear(Color.White);
                 bufferG.Clear(Color.White);
-                ClearConsole();
-
+                
                 var tokens = Lexer.Tokenize(txtInput.Text).ToArray();
-
-                ClearTurtles();
 
                 var mainTurtle = new Turtle("0")
                 {
@@ -157,10 +186,19 @@ namespace DuhnieLogo.UI
                 {
                     WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
                 }
-
-                drawTimer.Stop();
-                DrawViewport();
             }
+        }
+
+        private void EnableRunningMode()
+        {
+            txtInput.Enabled = false;
+            btnRun.Enabled = false;
+        }
+
+        private void DisableRunningMode()
+        {
+            txtInput.Enabled = true;
+            btnRun.Enabled = true;
         }
 
         private void RegisterBuiltInProcedures(Interpreter interpreter, Graphics bufferG)
@@ -178,7 +216,7 @@ namespace DuhnieLogo.UI
                 }
 
                 WriteToConsole(stringBuilder.ToString());
-
+                
                 return null;
             });
 
@@ -328,6 +366,17 @@ namespace DuhnieLogo.UI
 
                 return null;
             });
+
+            interpreter.RegisterFunction("toets?", new string[] { }, (_memorySpace, _arguments) =>
+            {
+                return inputProvider.KeyPressAvailable;
+            });
+
+            interpreter.RegisterFunction("leestoets", new string[] { }, (_memorySpace, _arguments) =>
+            {
+                var key = inputProvider.WaitForKeyPress();
+                return (int) key;
+            });
         }
 
         private void ClearConsole()
@@ -337,15 +386,30 @@ namespace DuhnieLogo.UI
 
         private void WriteToConsole(string message)
         {
-            if (txtOutput.Text.Length > 0)
-                txtOutput.AppendText(Environment.NewLine);
+            AppendText action = AppendToConsole;
+            var text = (txtOutput.Text.Length > 0 ? Environment.NewLine : "") + message;
 
-            txtOutput.AppendText(message);
+            if (txtOutput.InvokeRequired)
+                txtOutput.Invoke(action, text);
+            else
+                action(text);
+        }
+
+        private delegate void AppendText(string text);
+
+        private void AppendToConsole(string text)
+        {
+            txtOutput.AppendText(text);
         }
 
         private void panViewport_Resize(object sender, EventArgs e)
         {
             RecreateBuffer();
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            inputProvider.KeyDown(e.KeyCode);
         }
     }
 }

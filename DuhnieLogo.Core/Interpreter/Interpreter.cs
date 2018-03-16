@@ -41,6 +41,18 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
+            RegisterFunction("zolang", new string[] { "uitdrukking", "opdrachten" }, (_globalMemory, _arguments) => {
+                var expressionTokens = Lexer.Tokenize(string.Join(" ", (ListVariable)_arguments[0])).ToArray();
+                var bodyTokens = Lexer.Tokenize(string.Join(" ", (ListVariable)_arguments[1])).ToArray();
+
+                while(Convert.ToBoolean(InterpretExpression(expressionTokens)))
+                {
+                    Interpret(bodyTokens);
+                }
+
+                return null;
+            });
+
             RegisterFunction("telherhaal", new string[] {}, (_globalMemory, _arguments) => {
                 if (!memory.ContainsRecursive("iteratie"))
                     throw new ScriptException("Telherhaal kan alleen binnen een herhaal opdracht gebruikt worden");
@@ -217,6 +229,15 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 result = ex.Value;
             }
+
+            PopTokenStream();
+            return result;
+        }
+
+        public object InterpretExpression(Token[] tokens)
+        {
+            PushTokenStream(new TokenStream(tokens));
+            object result = Expression();
 
             PopTokenStream();
             return result;
