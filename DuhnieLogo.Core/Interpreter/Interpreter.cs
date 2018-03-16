@@ -2,6 +2,7 @@
 using DuhnieLogo.Core.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -132,6 +133,12 @@ namespace DuhnieLogo.Core.Interpreter
                     result.Add(arg.ToString());
 
                 return result;
+            });
+
+            RegisterFunction("openafbeelding", new string[] { "naam" }, (_globalMemory, _arguments) => {
+                var fileName = _arguments[0].ToString();
+
+                return Image.FromFile(fileName);
             });
 
             RegisterFunction("plaatserachter", new string[] { "element", "toevoegsel" }, (_globalMemory, _arguments) => {

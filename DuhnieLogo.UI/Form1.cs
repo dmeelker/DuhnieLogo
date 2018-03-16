@@ -76,7 +76,9 @@ namespace DuhnieLogo.UI
                 foreach (var turtle in turtles)
                 {
                     g.TranslateTransform((int)turtle.Location.X, (int)turtle.Location.Y);
-                    g.RotateTransform(turtle.Orientation);
+
+                    if(!turtle.VariantModus)
+                        g.RotateTransform(turtle.Orientation);
 
                     g.DrawImageUnscaled(turtle.Image, -(turtle.Image.Width / 2), -turtle.Image.Height);
                     g.ResetTransform();
@@ -280,6 +282,25 @@ namespace DuhnieLogo.UI
 
                 foreach (var turtle in activeTurtles)
                     turtle.PenColor = Color.FromArgb(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToInt32(values[2]));
+                return null;
+            });
+
+            interpreter.RegisterFunction("zetvariantmodus", new string[] { "aan" }, (_memorySpace, _arguments) =>
+            {
+                var enabled = Convert.ToBoolean(_arguments[0]);
+
+                foreach (var turtle in activeTurtles)
+                    turtle.VariantModus = enabled;
+                return null;
+            });
+
+            interpreter.RegisterFunction("zetvorm", new string[] { "afbeelding" }, (_memorySpace, _arguments) =>
+            {
+                var image = _arguments[0] as Image;
+
+                foreach (var turtle in activeTurtles)
+                    turtle.Image = image;
+
                 return null;
             });
 

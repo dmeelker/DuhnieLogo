@@ -22,6 +22,7 @@ namespace DuhnieLogo.UI.Model
         public Point Location { get; set; }
         public int Orientation { get; set; }
         public bool PenDown { get; set; } = true;
+        public bool VariantModus { get; set; } = false;
 
         private int penWidth = 1;
         public int PenWidth
