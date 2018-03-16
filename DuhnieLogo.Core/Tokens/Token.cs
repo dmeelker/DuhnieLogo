@@ -47,11 +47,19 @@ namespace DuhnieLogo.Core.Tokens
 
         LogicalAnd,
         LogicalOr,
-        Equals,
+        
         Plus,
         Minus,
         Multiply,
         Divide,
+
+        Equals,
+        NotEqual,
+        SmallerThan,
+        GreaterThan,
+        SmallerOrEqualThan,
+        GreaterOrEqualThan,
+        
 
         ParenthesisLeft,
         ParenthesisRight,
@@ -60,7 +68,8 @@ namespace DuhnieLogo.Core.Tokens
 
         Colon,
         Semicolon,
-        Assign,
+
+        
 
         Learn,
         End,

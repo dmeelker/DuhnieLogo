@@ -22,6 +22,7 @@ namespace DuhnieLogo.Core.Tokens
                 {
                     reader.ReadCharacter();
                 }
+
                 else if (character == '+')
                 {
                     tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Plus));
@@ -38,6 +39,51 @@ namespace DuhnieLogo.Core.Tokens
                 {
                     tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Divide));
                 }
+
+                else if (character == '=')
+                {
+                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Equals));
+                }
+                else if (character == '<')
+                {
+                    reader.ReadCharacter();
+                    var position = reader.CurrentPosition;
+
+                    var nextCharacter = reader.PeekCharacter().Value;
+
+                    if (nextCharacter == '=')
+                    {
+                        reader.ReadCharacter();
+                        tokens.Add(new Token(TokenType.SmallerOrEqualThan, "<=", position));
+                    }
+                    else if (nextCharacter == '>')
+                    {
+                        reader.ReadCharacter();
+                        tokens.Add(new Token(TokenType.NotEqual, "<>", position));
+                    }
+                    else
+                    {
+                        tokens.Add(new Token(TokenType.SmallerThan, "<", position));
+                    }
+                }
+                else if (character == '>')
+                {
+                    reader.ReadCharacter();
+                    var position = reader.CurrentPosition;
+
+                    var nextCharacter = reader.PeekCharacter().Value;
+
+                    if (nextCharacter == '=')
+                    {
+                        reader.ReadCharacter();
+                        tokens.Add(new Token(TokenType.GreaterOrEqualThan, ">=", position));
+                    }
+                    else
+                    {
+                        tokens.Add(new Token(TokenType.GreaterThan, ">", position));
+                    }
+                }
+
                 else if (character == ';')
                 {
                     while (reader.PeekCharacter() != '\n')
@@ -66,10 +112,6 @@ namespace DuhnieLogo.Core.Tokens
                 else if (character == ':')
                 {
                     tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Colon));
-                }
-                else if (character == '=')
-                {
-                    tokens.Add(ReadCharacterAndCreateToken(reader, TokenType.Equals));
                 }
                 else if (character == ',')
                 {

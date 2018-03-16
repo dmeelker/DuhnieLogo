@@ -363,6 +363,19 @@ namespace DuhnieLogo.Core.Interpreter
                     return (int)left * (int)right;
                 case TokenType.Divide:
                     return (int)left / (int)right;
+
+                case TokenType.Equals:
+                    return (int)left == (int)right;
+                case TokenType.NotEqual:
+                    return (int)left != (int)right;
+                case TokenType.GreaterThan:
+                    return (int) left > (int) right;
+                case TokenType.GreaterOrEqualThan:
+                    return (int)left >= (int)right;
+                case TokenType.SmallerThan:
+                    return (int)left <(int)right;
+                case TokenType.SmallerOrEqualThan:
+                    return (int)left <= (int)right;
             }
 
             throw new Exception($"Unknown operator {binaryOperatorNode.Operator}");
@@ -370,7 +383,26 @@ namespace DuhnieLogo.Core.Interpreter
 
         private Node ParseExpression()
         {
-            return ParseAdditiveExpression();
+            return ParseComparitiveExpression();
+        }
+
+        private Node ParseComparitiveExpression()
+        {
+            var node = ParseAdditiveExpression();
+
+            while (tokens.CurrentToken.Type == TokenType.Equals ||
+                tokens.CurrentToken.Type == TokenType.NotEqual ||
+                tokens.CurrentToken.Type == TokenType.SmallerThan || 
+                tokens.CurrentToken.Type == TokenType.SmallerOrEqualThan ||
+                tokens.CurrentToken.Type == TokenType.GreaterThan ||
+                tokens.CurrentToken.Type == TokenType.GreaterOrEqualThan)
+            {
+                var op = tokens.Eat(tokens.CurrentToken.Type);
+
+                node = new BinaryOperatorNode { Left = node, Right = ParseAdditiveExpression(), Operator = op };
+            }
+
+            return node;
         }
 
         private Node ParseAdditiveExpression()
