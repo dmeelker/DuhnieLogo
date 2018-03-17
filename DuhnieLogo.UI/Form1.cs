@@ -94,6 +94,7 @@ namespace DuhnieLogo.UI
             }
         }
 
+        private volatile Interpreter interpreter;
         private List<Turtle> turtles = new List<Turtle>();
         private LinkedList<Turtle> activeTurtles = new LinkedList<Turtle>();
         private Dictionary<string, Turtle> turtleIndex = new Dictionary<string, Turtle>();
@@ -177,7 +178,7 @@ namespace DuhnieLogo.UI
                 RegisterTurtle(mainTurtle);
                 ActivateTurtle(mainTurtle);
 
-                var interpreter = new Interpreter();
+                interpreter = new Interpreter();
                 RegisterBuiltInProcedures(interpreter, bufferG);
 
                 drawTimer.Start();
@@ -193,6 +194,10 @@ namespace DuhnieLogo.UI
                     else
                         WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
                 }
+                catch(ExcecutionStoppedException)
+                {
+                    WriteToConsole("Uitvoer afgebroken");
+                }
                 catch (Exception ex)
                 {
                     WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
@@ -204,12 +209,14 @@ namespace DuhnieLogo.UI
         {
             sourceField.Enabled = false;
             btnRun.Enabled = false;
+            btnStop.Enabled = true;
         }
 
         private void DisableRunningMode()
         {
             sourceField.Enabled = true;
             btnRun.Enabled = true;
+            btnStop.Enabled = false;
         }
 
         private void RegisterBuiltInProcedures(Interpreter interpreter, Graphics bufferG)
@@ -537,6 +544,11 @@ namespace DuhnieLogo.UI
                 token.Type == TokenType.Local ||
                 token.Type == TokenType.True ||
                 token.Type == TokenType.False;
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            interpreter.Stop();
         }
     }
 }

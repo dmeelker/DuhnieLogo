@@ -50,6 +50,7 @@
     <Compile Include="Interpreter\Ast\StringLiteralNode.cs" />
     <Compile Include="Interpreter\Ast\VariableNode.cs" />
     <Compile Include="Interpreter\BuiltInProcedure.cs" />
+    <Compile Include="Interpreter\ExcecutionStoppedException.cs" />
     <Compile Include="Interpreter\Interpreter.cs" />
     <Compile Include="Interpreter\CustomProcedureInfo.cs" />
     <Compile Include="Interpreter\ListVariable.cs" />

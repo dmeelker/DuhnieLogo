@@ -29,10 +29,11 @@
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.panEditor = new System.Windows.Forms.Panel();
             this.btnRun = new System.Windows.Forms.Button();
             this.panViewport = new System.Windows.Forms.Panel();
             this.txtOutput = new System.Windows.Forms.TextBox();
-            this.panEditor = new System.Windows.Forms.Panel();
+            this.btnStop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -48,6 +49,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnStop);
             this.splitContainer1.Panel1.Controls.Add(this.panEditor);
             this.splitContainer1.Panel1.Controls.Add(this.btnRun);
             this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
@@ -58,6 +60,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(1174, 450);
             this.splitContainer1.SplitterDistance = 582;
             this.splitContainer1.TabIndex = 2;
+            // 
+            // panEditor
+            // 
+            this.panEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panEditor.Location = new System.Drawing.Point(3, 3);
+            this.panEditor.Name = "panEditor";
+            this.panEditor.Size = new System.Drawing.Size(577, 415);
+            this.panEditor.TabIndex = 2;
             // 
             // btnRun
             // 
@@ -94,15 +106,17 @@
             this.txtOutput.Size = new System.Drawing.Size(588, 102);
             this.txtOutput.TabIndex = 0;
             // 
-            // panEditor
+            // btnStop
             // 
-            this.panEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panEditor.Location = new System.Drawing.Point(3, 3);
-            this.panEditor.Name = "panEditor";
-            this.panEditor.Size = new System.Drawing.Size(577, 415);
-            this.panEditor.TabIndex = 2;
+            this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnStop.Enabled = false;
+            this.btnStop.Location = new System.Drawing.Point(423, 424);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(75, 23);
+            this.btnStop.TabIndex = 3;
+            this.btnStop.Text = "Stop";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // Form1
             // 
@@ -131,6 +145,7 @@
         private System.Windows.Forms.Panel panViewport;
         private System.Windows.Forms.TextBox txtOutput;
         private System.Windows.Forms.Panel panEditor;
+        private System.Windows.Forms.Button btnStop;
     }
 }
 

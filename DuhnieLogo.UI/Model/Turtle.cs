@@ -18,7 +18,10 @@ namespace DuhnieLogo.UI.Model
         public Graphics GraphicsContext { get; set; }
 
         public string Name { get; set; }
-        public Image Image { get; set; }
+        private Image image;
+        public Image Image { get { return image; } set { image = value; ImageWidth = image.Width; ImageHeight = image.Height; } }
+        public int ImageWidth { get; private set; }
+        public int ImageHeight { get; private set; }
         public Point Location { get; set; }
         public int Orientation { get; set; }
         public bool PenDown { get; set; } = true;
@@ -109,7 +112,7 @@ namespace DuhnieLogo.UI.Model
             GraphicsContext.ResetTransform();
         }
 
-        public Rectangle BoundingBox => new Rectangle((int) Location.X, (int) Location.Y, Image.Width, Image.Height);
+        public Rectangle BoundingBox => new Rectangle((int) Location.X, (int) Location.Y, ImageWidth, ImageHeight);
     }
 }
 

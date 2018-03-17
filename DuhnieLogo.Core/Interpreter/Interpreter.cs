@@ -22,6 +22,8 @@ namespace DuhnieLogo.Core.Interpreter
         private Dictionary<string, ProcedureInfo> procedures = new Dictionary<string, ProcedureInfo>();
         private readonly Random random = new Random();
 
+        private volatile bool stopRequested = false;
+
         public Interpreter()
         {
             RegisterFunction("herhaal",  new string[] { "count", "commands" }, (_globalMemory, _arguments) => {
@@ -218,8 +220,15 @@ namespace DuhnieLogo.Core.Interpreter
             memory = memoryStack.Pop();
         }
 
+        public void Stop()
+        {
+            stopRequested = true;
+        }
+
         public object Interpret(Token[] tokens)
         {
+            stopRequested = false;
+
             PushTokenStream(new TokenStream(tokens));
             object result = null;
             try
@@ -236,6 +245,8 @@ namespace DuhnieLogo.Core.Interpreter
 
         public object InterpretExpression(Token[] tokens)
         {
+            stopRequested = false;
+
             PushTokenStream(new TokenStream(tokens));
             object result = Expression();
 
@@ -245,8 +256,13 @@ namespace DuhnieLogo.Core.Interpreter
 
         private object StatementList()
         {
-            while(tokens.CurrentToken.Type != TokenType.ProgramEnd)
+            while (tokens.CurrentToken.Type != TokenType.ProgramEnd)
+            {
                 Statement();
+
+                if (stopRequested)
+                    throw new ExcecutionStoppedException();
+            }
 
             return null;
         }
