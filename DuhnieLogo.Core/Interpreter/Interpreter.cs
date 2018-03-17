@@ -170,6 +170,18 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
+            RegisterFunction("element", new string[] { "welke", "aanduiding" }, (_globalMemory, _arguments) => {
+                var index = _arguments[0];
+                var source = _arguments[1];
+
+                if (source is ListVariable)
+                {
+                    return ((ListVariable)source) [Convert.ToInt32(index)];
+                }
+
+                return null;
+            });
+
             RegisterFunction("woord", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
                 var result = new StringBuilder();
 

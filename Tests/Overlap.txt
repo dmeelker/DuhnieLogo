@@ -8,6 +8,10 @@ eind
 
 leer Opbouwen
  maakturtle "boef [100 100 90]
+ gebruik "boef
+ zetvorm openafbeelding "Images\\auto\.png
+
+ gebruik 0
 eind
 
 leer Frame
@@ -23,7 +27,11 @@ eind
 leer BoefLoop
  gebruik "boef
  vooruit 1
+ lokaal "positie
+ maak "positie positie
 
+ ;laatzien element 0 :positie
+ ;als (element 0 :positie) > 700 [wegturtle achteruit 700 kom] []
  gebruik 0
 eind
 

@@ -130,6 +130,15 @@ namespace DuhnieLogo.UI
             throw new ScriptException($"Er bestaat geen turtle met naam '{name}'");
         }
 
+        private Turtle GetFirstActiveTurtle()
+        {
+            var activeTurtle = activeTurtles.FirstOrDefault();
+            if (activeTurtle == null)
+                throw new ScriptException("Er is geen active turtle");
+
+            return activeTurtle;
+        }
+
         private void btnRun_Click(object sender, EventArgs e)
         {
             EnableRunningMode();
@@ -300,10 +309,7 @@ namespace DuhnieLogo.UI
                 else
                     turtleNames = new List<string>() { _arguments[0].ToString() };
 
-                var activeTurtle = activeTurtles.FirstOrDefault();
-                if (activeTurtle == null)
-                    throw new ScriptException("Er is geen active turtle");
-
+                var activeTurtle = GetFirstActiveTurtle();
                 var activeTurtleBounds = activeTurtle.BoundingBox;
 
                 foreach(var name in turtleNames)
@@ -357,6 +363,13 @@ namespace DuhnieLogo.UI
                 foreach (var turtle in activeTurtles)
                     turtle.Move(Convert.ToInt32(position[0]), Convert.ToInt32(position[1]));
                 return null;
+            });
+
+            interpreter.RegisterFunction("positie", new string[] { }, (_memorySpace, _arguments) =>
+            {
+                var activeTurtle = GetFirstActiveTurtle();
+
+                return new ListVariable(new string[] { ((int) activeTurtle.Location.X).ToString(), ((int) activeTurtle.Location.Y).ToString() });
             });
 
             interpreter.RegisterFunction("links", new string[] { "stappen" }, (_memorySpace, _arguments) =>
