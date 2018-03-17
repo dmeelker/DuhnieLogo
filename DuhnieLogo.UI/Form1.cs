@@ -80,6 +80,9 @@ namespace DuhnieLogo.UI
 
                 foreach (var turtle in turtles)
                 {
+                    if (!turtle.Visible)
+                        continue;
+
                     g.TranslateTransform((int)turtle.Location.X, (int)turtle.Location.Y);
 
                     if(!turtle.VariantModus)
@@ -221,7 +224,7 @@ namespace DuhnieLogo.UI
 
         private void RegisterBuiltInProcedures(Interpreter interpreter, Graphics bufferG)
         {
-            interpreter.RegisterFunction("print", new string[] { "message" }, (_globalMemory, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "print", "laatzien" }, new string[] { "message" }, (_globalMemory, _arguments) =>
             {
                 var stringBuilder = new StringBuilder();
 
@@ -260,6 +263,11 @@ namespace DuhnieLogo.UI
                 RegisterTurtle(turtle);
 
                 return null;
+            });
+
+            interpreter.RegisterFunction(new string[] { "alleturtles", "alle" }, new string[] { }, (_memorySpace, _arguments) =>
+            {
+                return new ListVariable(turtles.Select(turtle => turtle.Name));
             });
 
             interpreter.RegisterFunction("gebruik", new string[] { "turtles" }, (_memorySpace, _arguments) =>
@@ -309,17 +317,45 @@ namespace DuhnieLogo.UI
                 return false;
             });
 
-            interpreter.RegisterFunction("vooruit", new string[] { "stappen" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("wegturtle", new string[] {}, (_memorySpace, _arguments) =>
+            {
+                foreach (var turtle in activeTurtles)
+                    turtle.Visible = false;
+                return null;
+            });
+
+            interpreter.RegisterFunction("kom", new string[] { }, (_memorySpace, _arguments) =>
+            {
+                foreach (var turtle in activeTurtles)
+                    turtle.Visible = true;
+                return null;
+            });
+
+            interpreter.RegisterFunction(new string[] { "vooruit", "vt" }, new string[] { "stappen" }, (_memorySpace, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Forward((int)_arguments[0]);
                 return null;
             });
 
-            interpreter.RegisterFunction("achteruit", new string[] { "stappen" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "achteruit", "at" }, new string[] { "stappen" }, (_memorySpace, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Forward(-(int)_arguments[0]);
+                return null;
+            });
+
+            interpreter.RegisterFunction("zetpos", new string[] { "positie" }, (_memorySpace, _arguments) =>
+            {
+                if (!(_arguments[0] is ListVariable))
+                    throw new ScriptException("Zetpos verwacht een lijst als argument");
+
+                var position = _arguments[0] as ListVariable;
+                if(position.Count != 2)
+                    throw new ScriptException("Zetpos verwacht een lijst met twee waarden");
+
+                foreach (var turtle in activeTurtles)
+                    turtle.Move(Convert.ToInt32(position[0]), Convert.ToInt32(position[1]));
                 return null;
             });
 
@@ -334,6 +370,13 @@ namespace DuhnieLogo.UI
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Right((int)_arguments[0]);
+                return null;
+            });
+
+            interpreter.RegisterFunction(new string[] { "zetrichting", "zr" }, new string[] { "richting" }, (_memorySpace, _arguments) =>
+            {
+                foreach (var turtle in activeTurtles)
+                    turtle.Orientation = (int)_arguments[0];
                 return null;
             });
 

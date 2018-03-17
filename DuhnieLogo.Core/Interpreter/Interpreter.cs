@@ -198,6 +198,12 @@ namespace DuhnieLogo.Core.Interpreter
             procedures.Add(name.ToLower(), new BuiltInProcedure { Name = name, Arguments = arguments, Implementation = implementation });
         }
 
+        public void RegisterFunction(string[] names, string[] arguments, Func<MemorySpace, object[], object> implementation)
+        {
+            foreach(var name in names)
+                RegisterFunction(name, arguments, implementation);
+        }
+
         private void PushTokenStream(TokenStream tokenStream)
         {
             tokenStack.Push(tokens);
