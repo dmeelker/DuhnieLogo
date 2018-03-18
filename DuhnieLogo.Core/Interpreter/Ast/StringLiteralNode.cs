@@ -10,5 +10,8 @@ namespace DuhnieLogo.Core.Interpreter.Ast
     class StringLiteralNode : Node
     {
         public Token Value { get; set; }
+
+        public StringLiteralNode(TokenPosition position) : base(position)
+        { }
     }
 }

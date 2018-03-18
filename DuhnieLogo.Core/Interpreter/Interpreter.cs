@@ -29,7 +29,7 @@ namespace DuhnieLogo.Core.Interpreter
             RegisterFunction("herhaal",  new string[] { "count", "commands" }, (_context, _arguments) => {
                 if (!(_arguments[1] is ListVariable))
                     throw new ScriptException("Herhaal verwacht een lijst van opdrachten", _context.CallToken);
-
+                //_context.GetArgument("count");
                 var memorySpace = new MemorySpace(memory);
                 PushMemorySpace(memorySpace);
 
@@ -500,7 +500,7 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var op = tokens.Eat(tokens.CurrentToken.Type);
 
-                node = new BinaryOperatorNode { Left = node, Right = ParseAdditiveExpression(), Operator = op };
+                node = new BinaryOperatorNode(node.Position) { Left = node, Right = ParseAdditiveExpression(), Operator = op };
             }
 
             return node;
@@ -514,7 +514,7 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var op = tokens.Eat(tokens.CurrentToken.Type);
 
-                node = new BinaryOperatorNode { Left = node, Right = ParseMultiplicativeExpression(), Operator = op };
+                node = new BinaryOperatorNode(node.Position) { Left = node, Right = ParseMultiplicativeExpression(), Operator = op };
             }
 
             return node;
@@ -528,7 +528,7 @@ namespace DuhnieLogo.Core.Interpreter
             {
                 var op = tokens.Eat(tokens.CurrentToken.Type);
 
-                node = new BinaryOperatorNode { Left = node, Right = ParseFactor(), Operator = op };
+                node = new BinaryOperatorNode(node.Position) { Left = node, Right = ParseFactor(), Operator = op };
             }
 
             return node;
@@ -536,6 +536,8 @@ namespace DuhnieLogo.Core.Interpreter
 
         private Node ParseFactor()
         {
+            var position = tokens.CurrentToken.Location;
+
             if(tokens.CurrentToken.Type == TokenType.ParenthesisLeft)
             {
                 tokens.Eat(TokenType.ParenthesisLeft);
@@ -551,7 +553,7 @@ namespace DuhnieLogo.Core.Interpreter
                     while(tokens.CurrentToken.Type != TokenType.ParenthesisRight)
                         argumentExpressions.Add(ParseExpression());
 
-                    node = new ProcedureCallNode { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
+                    node = new ProcedureCallNode(position) { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
                 }
                 else
                 {
@@ -567,35 +569,35 @@ namespace DuhnieLogo.Core.Interpreter
                 // List
                 tokens.Eat(TokenType.BracketLeft);
 
-                var values = new ListVariable() { FirstToken = tokens.CurrentToken};
+                var values = new ListVariable();
                 while(tokens.CurrentToken.Type != TokenType.BracketRight)
                     values.Add(tokens.Eat().LiteralValue);
 
                 tokens.Eat(TokenType.BracketRight);
 
-                return new ListNode { Values = values };
+                return new ListNode(position) { Values = values };
             }
             else if (tokens.CurrentToken.Type == TokenType.Integer)
             {
                 var token = tokens.Eat(TokenType.Integer);
-                return new IntegerNode { Value = Convert.ToInt32(token.Value) };
+                return new IntegerNode(position) { Value = Convert.ToInt32(token.Value) };
             }
             else if (tokens.CurrentToken.Type == TokenType.True || tokens.CurrentToken.Type == TokenType.False)
             {
                 var token = tokens.Eat();
-                return new BooleanNode { Value = token.Value.Equals("welwaar", StringComparison.CurrentCultureIgnoreCase) };
+                return new BooleanNode(position) { Value = token.Value.Equals("welwaar", StringComparison.CurrentCultureIgnoreCase) };
             }
             else if (tokens.CurrentToken.Type == TokenType.Colon)
             {
                 tokens.Eat(TokenType.Colon);
                 var variableName = tokens.Eat(TokenType.Identifier);
                 
-                return new VariableNode { Name = variableName };
+                return new VariableNode(position) { Name = variableName };
             }
             else if(tokens.CurrentToken.Type == TokenType.StringLiteral)
             {
                 var value = tokens.Eat(TokenType.StringLiteral);
-                return new StringLiteralNode() { Value = value };
+                return new StringLiteralNode(position) { Value = value };
             }
             else if (tokens.CurrentToken.Type == TokenType.Identifier)
             {
@@ -605,7 +607,7 @@ namespace DuhnieLogo.Core.Interpreter
                 for(int i=0; i<procedure.Arguments.Length; i++)
                     argumentExpressions.Add(ParseExpression());
 
-                return new ProcedureCallNode { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
+                return new ProcedureCallNode(position) { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
             }
 
             throw new ScriptException($"Onverwachte invoer: {tokens.CurrentToken}", tokens.CurrentToken);

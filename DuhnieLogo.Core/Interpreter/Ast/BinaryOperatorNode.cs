@@ -12,5 +12,8 @@ namespace DuhnieLogo.Core.Interpreter.Ast
         public Node Left { get; set; }
         public Node Right { get; set; }
         public Token Operator { get; set; }
-    }
+
+        public BinaryOperatorNode(TokenPosition position) : base(position)
+        { }
+     }
 }

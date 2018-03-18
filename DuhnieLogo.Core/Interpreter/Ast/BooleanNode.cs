@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DuhnieLogo.Core.Tokens;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,8 @@ namespace DuhnieLogo.Core.Interpreter.Ast
     class BooleanNode : Node
     {
         public bool Value { get; set; }
+
+        public BooleanNode(TokenPosition position) : base(position)
+        { }
     }
 }

@@ -11,5 +11,8 @@ namespace DuhnieLogo.Core.Interpreter.Ast
     {
         public Token Name { get; set; }
         public Node[] ArgumentExpressions { get; set; }
+
+        public ProcedureCallNode(TokenPosition position) : base(position)
+        { }
     }
 }

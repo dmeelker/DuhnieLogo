@@ -10,5 +10,8 @@ namespace DuhnieLogo.Core.Interpreter.Ast
     class VariableNode : Node
     {
         public Token Name { get; set; }
+
+        public VariableNode(TokenPosition position) : base(position)
+        { }
     }
 }
