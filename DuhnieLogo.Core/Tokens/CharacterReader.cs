@@ -10,8 +10,8 @@ namespace DuhnieLogo.Core.Tokens
     {
         private string input;
         private int currentIndex;
-        public int CurrentRow { get; private set; }
-        public int CurrentColumn { get; private set; }
+        public int CurrentRow { get; private set; } = 0;
+        public int CurrentColumn { get; private set; } = 0;
         
         public TokenPosition CurrentPosition => new TokenPosition(CurrentRow, CurrentColumn, currentIndex);
 
@@ -26,19 +26,21 @@ namespace DuhnieLogo.Core.Tokens
             if (AtEnd)
                 return null;
 
-            currentIndex++;
-            var chr = input[currentIndex];
-            
-            if(chr == '\n')
+            if (currentIndex > -1)
             {
-                CurrentRow++;
-                CurrentColumn = 0;
-            } else
-            {
-                CurrentColumn++;
+                if (input[currentIndex] == '\n')
+                {
+                    CurrentRow++;
+                    CurrentColumn = 0;
+                }
+                else
+                {
+                    CurrentColumn++;
+                }
             }
 
-            return chr;
+            currentIndex++;
+            return input[currentIndex];
         }
 
         public char? PeekCharacter()

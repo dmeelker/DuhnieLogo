@@ -8,6 +8,6 @@ namespace DuhnieLogo.Core.Interpreter
 {
     class BuiltInProcedure : ProcedureInfo
     {
-        public Func<MemorySpace, object[], object> Implementation { get; set; }
+        public Func<ProcedureCallContext, object[], object> Implementation { get; set; }
     }
 }

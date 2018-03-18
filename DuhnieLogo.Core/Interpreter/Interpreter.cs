@@ -26,7 +26,10 @@ namespace DuhnieLogo.Core.Interpreter
 
         public Interpreter()
         {
-            RegisterFunction("herhaal",  new string[] { "count", "commands" }, (_globalMemory, _arguments) => {
+            RegisterFunction("herhaal",  new string[] { "count", "commands" }, (_context, _arguments) => {
+                if (!(_arguments[1] is ListVariable))
+                    throw new ScriptException("Herhaal verwacht een lijst van opdrachten", _context.CallToken);
+
                 var memorySpace = new MemorySpace(memory);
                 PushMemorySpace(memorySpace);
 
@@ -43,7 +46,7 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
-            RegisterFunction("zolang", new string[] { "uitdrukking", "opdrachten" }, (_globalMemory, _arguments) => {
+            RegisterFunction("zolang", new string[] { "uitdrukking", "opdrachten" }, (_context, _arguments) => {
                 var expressionTokens = Lexer.Tokenize(string.Join(" ", (ListVariable)_arguments[0])).ToArray();
                 var bodyTokens = Lexer.Tokenize(string.Join(" ", (ListVariable)_arguments[1])).ToArray();
 
@@ -55,26 +58,26 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
-            RegisterFunction("telherhaal", new string[] {}, (_globalMemory, _arguments) => {
+            RegisterFunction("telherhaal", new string[] {}, (_context, _arguments) => {
                 if (!memory.ContainsRecursive("iteratie"))
                     throw new ScriptException("Telherhaal kan alleen binnen een herhaal opdracht gebruikt worden");
 
                 return memory.Get("iteratie");
             });
 
-            RegisterFunction("en", new string[] {"aanduiding1", "aanduiding2" }, (_globalMemory, _arguments) => {
+            RegisterFunction("en", new string[] {"aanduiding1", "aanduiding2" }, (_context, _arguments) => {
                 return _arguments.All(arg => Convert.ToBoolean(arg));
             });
 
-            RegisterFunction("of", new string[] { "aanduiding1", "aanduiding2" }, (_globalMemory, _arguments) => {
+            RegisterFunction("of", new string[] { "aanduiding1", "aanduiding2" }, (_context, _arguments) => {
                 return _arguments.Any(arg => Convert.ToBoolean(arg));
             });
 
-            RegisterFunction("niet", new string[] { "aanduiding" }, (_globalMemory, _arguments) => {
+            RegisterFunction("niet", new string[] { "aanduiding" }, (_context, _arguments) => {
                 return !Convert.ToBoolean(_arguments[0]);
             });
 
-            RegisterFunction("als", new string[] { "conditie", "alsWelwaar", "alsNietwaar" }, (_globalMemory, _arguments) => {
+            RegisterFunction("als", new string[] { "conditie", "alsWelwaar", "alsNietwaar" }, (_context, _arguments) => {
                 var boolean = Convert.ToBoolean(_arguments[0]);
 
                 if (_arguments[1] is ListVariable && _arguments[2] is ListVariable)
@@ -97,14 +100,14 @@ namespace DuhnieLogo.Core.Interpreter
                 }
             });
 
-            RegisterFunction("test", new string[] { "conditie" }, (_globalMemory, _arguments) => {
+            RegisterFunction("test", new string[] { "conditie" }, (_context, _arguments) => {
                 var boolean = Convert.ToBoolean(_arguments[0]);
 
                 memory.Set("testResultaat", boolean);
                 return null;
             });
 
-            RegisterFunction("alswaar", new string[] { "instructies" }, (_globalMemory, _arguments) => {
+            RegisterFunction("alswaar", new string[] { "instructies" }, (_context, _arguments) => {
                 if (!memory.ContainsRecursive("testResultaat"))
                     throw new ScriptException("Alswaar kan alleen na een aanroep van test gebruikt worden");
 
@@ -122,7 +125,7 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
-            RegisterFunction("alsnietwaar", new string[] { "instructies" }, (_globalMemory, _arguments) => {
+            RegisterFunction("alsnietwaar", new string[] { "instructies" }, (_context, _arguments) => {
                 if (!memory.ContainsRecursive("testResultaat"))
                     throw new ScriptException("Alsnietwaar kan alleen na een aanroep van test gebruikt worden");
 
@@ -140,7 +143,7 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
-            RegisterFunction("lijst", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
+            RegisterFunction("lijst", new string[] { "arg1", "arg2" }, (_context, _arguments) => {
                 var result = new ListVariable();
 
                 foreach (var arg in _arguments)
@@ -149,13 +152,13 @@ namespace DuhnieLogo.Core.Interpreter
                 return result;
             });
 
-            RegisterFunction("openafbeelding", new string[] { "naam" }, (_globalMemory, _arguments) => {
+            RegisterFunction("openafbeelding", new string[] { "naam" }, (_context, _arguments) => {
                 var fileName = _arguments[0].ToString();
 
                 return Image.FromFile(fileName);
             });
 
-            RegisterFunction("plaatserachter", new string[] { "element", "toevoegsel" }, (_globalMemory, _arguments) => {
+            RegisterFunction("plaatserachter", new string[] { "element", "toevoegsel" }, (_context, _arguments) => {
                 var target = _arguments[1];
                 var addition = _arguments[0];
 
@@ -170,7 +173,7 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
-            RegisterFunction("element", new string[] { "welke", "aanduiding" }, (_globalMemory, _arguments) => {
+            RegisterFunction("element", new string[] { "welke", "aanduiding" }, (_context, _arguments) => {
                 var index = _arguments[0];
                 var source = _arguments[1];
 
@@ -182,7 +185,7 @@ namespace DuhnieLogo.Core.Interpreter
                 return null;
             });
 
-            RegisterFunction("woord", new string[] { "arg1", "arg2" }, (_globalMemory, _arguments) => {
+            RegisterFunction("woord", new string[] { "arg1", "arg2" }, (_context, _arguments) => {
                 var result = new StringBuilder();
 
                 foreach (var arg in _arguments)
@@ -191,12 +194,12 @@ namespace DuhnieLogo.Core.Interpreter
                 return result.ToString();
             });
 
-            RegisterFunction("gok", new string[] { "maximum" }, (_globalMemory, _arguments) => {
+            RegisterFunction("gok", new string[] { "maximum" }, (_context, _arguments) => {
                 var max = (int)_arguments[0];
                 return random.Next(max - 1);
             });
 
-            RegisterFunction("wacht", new string[] { "duration" }, (_globalMemory, _arguments) => {
+            RegisterFunction("wacht", new string[] { "duration" }, (_context, _arguments) => {
                 Thread.Sleep((int)_arguments[0]);
                 return null;
             });
@@ -205,12 +208,12 @@ namespace DuhnieLogo.Core.Interpreter
             memory = globalMemory;
         }
 
-        public void RegisterFunction(string name, string[] arguments, Func<MemorySpace, object[], object> implementation)
+        public void RegisterFunction(string name, string[] arguments, Func<ProcedureCallContext, object[], object> implementation)
         {
             procedures.Add(name.ToLower(), new BuiltInProcedure { Name = name, Arguments = arguments, Implementation = implementation });
         }
 
-        public void RegisterFunction(string[] names, string[] arguments, Func<MemorySpace, object[], object> implementation)
+        public void RegisterFunction(string[] names, string[] arguments, Func<ProcedureCallContext, object[], object> implementation)
         {
             foreach(var name in names)
                 RegisterFunction(name, arguments, implementation);
@@ -436,7 +439,11 @@ namespace DuhnieLogo.Core.Interpreter
                 var builtInProcedure = procedure as BuiltInProcedure;
 
                 var arguments = node.ArgumentExpressions.Select(arg => InterpretNode(arg)).ToArray();
-                return builtInProcedure.Implementation(globalMemory, arguments);
+                var context = new ProcedureCallContext() {
+                    GlobalMemory = globalMemory,
+                    CallToken = node.Name
+                };
+                return builtInProcedure.Implementation(context, arguments);
             }
 
             throw new Exception($"Unknown procedure type {procedure}");
@@ -560,7 +567,7 @@ namespace DuhnieLogo.Core.Interpreter
                 // List
                 tokens.Eat(TokenType.BracketLeft);
 
-                var values = new ListVariable();
+                var values = new ListVariable() { FirstToken = tokens.CurrentToken};
                 while(tokens.CurrentToken.Type != TokenType.BracketRight)
                     values.Add(tokens.Eat().LiteralValue);
 

@@ -233,7 +233,7 @@ namespace DuhnieLogo.UI
 
         private void RegisterBuiltInProcedures(Interpreter interpreter, Graphics bufferG)
         {
-            interpreter.RegisterFunction(new string[] { "print", "laatzien" }, new string[] { "message" }, (_globalMemory, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "print", "laatzien" }, new string[] { "message" }, (_context, _arguments) =>
             {
                 var stringBuilder = new StringBuilder();
 
@@ -252,7 +252,7 @@ namespace DuhnieLogo.UI
 
             
 
-            interpreter.RegisterFunction("maakturtle", new string[] { "naam", "opties" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("maakturtle", new string[] { "naam", "opties" }, (_context, _arguments) =>
             {
                 var turtle = new Turtle(_arguments[0].ToString())
                 {
@@ -274,12 +274,12 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction(new string[] { "alleturtles", "alle" }, new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "alleturtles", "alle" }, new string[] { }, (_context, _arguments) =>
             {
                 return new ListVariable(turtles.Select(turtle => turtle.Name));
             });
 
-            interpreter.RegisterFunction("gebruik", new string[] { "turtles" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("gebruik", new string[] { "turtles" }, (_context, _arguments) =>
             {
                 activeTurtles.Clear();
 
@@ -300,7 +300,7 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction("overlap?", new string[] { "turtles" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("overlap?", new string[] { "turtles" }, (_context, _arguments) =>
             {
                 List<string> turtleNames;
 
@@ -323,35 +323,35 @@ namespace DuhnieLogo.UI
                 return false;
             });
 
-            interpreter.RegisterFunction("wegturtle", new string[] {}, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("wegturtle", new string[] {}, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Visible = false;
                 return null;
             });
 
-            interpreter.RegisterFunction("kom", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("kom", new string[] { }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Visible = true;
                 return null;
             });
 
-            interpreter.RegisterFunction(new string[] { "vooruit", "vt" }, new string[] { "stappen" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "vooruit", "vt" }, new string[] { "stappen" }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Forward((int)_arguments[0]);
                 return null;
             });
 
-            interpreter.RegisterFunction(new string[] { "achteruit", "at" }, new string[] { "stappen" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "achteruit", "at" }, new string[] { "stappen" }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Forward(-(int)_arguments[0]);
                 return null;
             });
 
-            interpreter.RegisterFunction("zetpos", new string[] { "positie" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("zetpos", new string[] { "positie" }, (_context, _arguments) =>
             {
                 if (!(_arguments[0] is ListVariable))
                     throw new ScriptException("Zetpos verwacht een lijst als argument");
@@ -365,56 +365,56 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction("positie", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("positie", new string[] { }, (_context, _arguments) =>
             {
                 var activeTurtle = GetFirstActiveTurtle();
 
                 return new ListVariable(new string[] { ((int) activeTurtle.Location.X).ToString(), ((int) activeTurtle.Location.Y).ToString() });
             });
 
-            interpreter.RegisterFunction("links", new string[] { "stappen" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("links", new string[] { "stappen" }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Left((int)_arguments[0]);
                 return null;
             });
 
-            interpreter.RegisterFunction("rechts", new string[] { "stappen" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("rechts", new string[] { "stappen" }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Right((int)_arguments[0]);
                 return null;
             });
 
-            interpreter.RegisterFunction(new string[] { "zetrichting", "zr" }, new string[] { "richting" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction(new string[] { "zetrichting", "zr" }, new string[] { "richting" }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.Orientation = (int)_arguments[0];
                 return null;
             });
 
-            interpreter.RegisterFunction("penop", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("penop", new string[] { }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.PenDown = false;
                 return null;
             });
 
-            interpreter.RegisterFunction("penneer", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("penneer", new string[] { }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.PenDown = true;
                 return null;
             });
 
-            interpreter.RegisterFunction("zetpendikte", new string[] { "dikte" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("zetpendikte", new string[] { "dikte" }, (_context, _arguments) =>
             {
                 foreach (var turtle in activeTurtles)
                     turtle.PenWidth = (int)_arguments[0];
                 return null;
             });
 
-            interpreter.RegisterFunction("zetpenkleur", new string[] { "kleur" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("zetpenkleur", new string[] { "kleur" }, (_context, _arguments) =>
             {
                 var values = (ListVariable)_arguments[0];
 
@@ -423,7 +423,7 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction("zetvariantmodus", new string[] { "aan" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("zetvariantmodus", new string[] { "aan" }, (_context, _arguments) =>
             {
                 var enabled = Convert.ToBoolean(_arguments[0]);
 
@@ -432,7 +432,7 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction("zetvorm", new string[] { "afbeelding" }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("zetvorm", new string[] { "afbeelding" }, (_context, _arguments) =>
             {
                 var image = _arguments[0] as Image;
 
@@ -442,13 +442,13 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction("wistekening", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("wistekening", new string[] { }, (_context, _arguments) =>
             {
                 bufferG.Clear(Color.White);
                 return null;
             });
 
-            interpreter.RegisterFunction("printnaartv", new string[] { "tekst"}, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("printnaartv", new string[] { "tekst"}, (_context, _arguments) =>
             {
                 var stringBuilder = new StringBuilder();
 
@@ -467,12 +467,12 @@ namespace DuhnieLogo.UI
                 return null;
             });
 
-            interpreter.RegisterFunction("toets?", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("toets?", new string[] { }, (_context, _arguments) =>
             {
                 return inputProvider.KeyPressAvailable;
             });
 
-            interpreter.RegisterFunction("leestoets", new string[] { }, (_memorySpace, _arguments) =>
+            interpreter.RegisterFunction("leestoets", new string[] { }, (_context, _arguments) =>
             {
                 var key = inputProvider.WaitForKeyPress();
                 return (int) key;
