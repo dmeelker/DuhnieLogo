@@ -450,26 +450,26 @@ namespace DuhnieLogo.Core.Interpreter
             switch (binaryOperatorNode.Operator.Type)
             {
                 case TokenType.Plus:
-                    return (int)left + (int)right;
+                    return Convert.ToInt32(left) + Convert.ToInt32(right);
                 case TokenType.Minus:
-                    return (int)left - (int)right;
+                    return Convert.ToInt32(left) - Convert.ToInt32(right);
                 case TokenType.Multiply:
-                    return (int)left * (int)right;
+                    return Convert.ToInt32(left) * Convert.ToInt32(right);
                 case TokenType.Divide:
-                    return (int)left / (int)right;
+                    return Convert.ToInt32(left) / Convert.ToInt32(right);
 
                 case TokenType.Equals:
                     return (int)left == (int)right;
                 case TokenType.NotEqual:
                     return (int)left != (int)right;
                 case TokenType.GreaterThan:
-                    return (int) left > (int) right;
+                    return Convert.ToInt32(left) > Convert.ToInt32(right);
                 case TokenType.GreaterOrEqualThan:
-                    return (int)left >= (int)right;
+                    return Convert.ToInt32(left) >= Convert.ToInt32(right);
                 case TokenType.SmallerThan:
-                    return (int)left <(int)right;
+                    return Convert.ToInt32(left) < Convert.ToInt32(right);
                 case TokenType.SmallerOrEqualThan:
-                    return (int)left <= (int)right;
+                    return Convert.ToInt32(left) <= Convert.ToInt32(right);
             }
 
             throw new Exception($"Unknown operator {binaryOperatorNode.Operator}");
