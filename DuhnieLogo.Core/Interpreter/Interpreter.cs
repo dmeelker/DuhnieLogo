@@ -35,10 +35,16 @@ namespace DuhnieLogo.Core.Interpreter
 
                 var tokens = Lexer.Tokenize(string.Join(" ", (ListVariable)_arguments[1])).ToArray();
 
-                for(int i=0; i<(int) _arguments[0]; i++)
+                try
                 {
-                    memorySpace.Set("iteratie", i+1);
-                    Interpret(tokens);
+                    for (int i = 0; i < (int)_arguments[0]; i++)
+                    {
+                        memorySpace.Set("iteratie", i + 1);
+                        Interpret(tokens);
+                    }
+                }catch(Exception ex)
+                {
+                    throw new ScriptException($"Fout in herhaal", _context.CallToken, ex);
                 }
 
                 PopMemorySpace();
@@ -312,8 +318,9 @@ namespace DuhnieLogo.Core.Interpreter
             var procedureInfo = new CustomProcedureInfo();
 
             tokens.Eat(TokenType.Learn);
-            
-            procedureInfo.Name = tokens.Eat(TokenType.Identifier).Value;
+
+            var nameToken = tokens.Eat(TokenType.Identifier);
+            procedureInfo.Name = nameToken.Value;
 
             var arguments = new ListVariable();
             while(tokens.CurrentToken.Type == TokenType.Colon)
@@ -332,6 +339,9 @@ namespace DuhnieLogo.Core.Interpreter
 
             tokens.Eat(TokenType.End);
             procedureInfo.Tokens = procTokens.ToArray();
+
+            if (ProcedureExists(procedureInfo.Name))
+                throw new ScriptException($"Er bestaat al een procedure '{procedureInfo.Name}'", nameToken);
 
             procedures[procedureInfo.Name.ToLower()] = procedureInfo;
         }
@@ -604,13 +614,21 @@ namespace DuhnieLogo.Core.Interpreter
                 var name = tokens.Eat(TokenType.Identifier);
                 var procedure = ResolveProcedure(name);
                 var argumentExpressions = new List<Node>();
-                for(int i=0; i<procedure.Arguments.Length; i++)
+
+                for (int i = 0; i < procedure.Arguments.Length; i++)
+                {
                     argumentExpressions.Add(ParseExpression());
+                }
 
                 return new ProcedureCallNode(position) { Name = name, ArgumentExpressions = argumentExpressions.ToArray() };
             }
 
             throw new ScriptException($"Onverwachte invoer: {tokens.CurrentToken}", tokens.CurrentToken);
+        }
+
+        private bool ProcedureExists(string name)
+        {
+            return procedures.ContainsKey(name.ToLower());
         }
 
         private ProcedureInfo ResolveProcedure(Token token)

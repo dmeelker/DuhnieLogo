@@ -12,6 +12,7 @@ namespace DuhnieLogo.UI.Model
         private readonly Queue<QueuedKeyPress> buffer = new Queue<QueuedKeyPress>();
         private readonly System.Timers.Timer cleanupTimer = new System.Timers.Timer(20);
         private readonly object waitLock = new object();
+        private readonly HashSet<System.Windows.Forms.Keys> downKeys = new HashSet<System.Windows.Forms.Keys>();
 
         public InputProvider()
         {
@@ -27,11 +28,22 @@ namespace DuhnieLogo.UI.Model
         public void KeyDown(System.Windows.Forms.Keys key)
         {
             buffer.Enqueue(new QueuedKeyPress { Key = key, Time = DateTime.Now.Ticks });
+            downKeys.Add(key);
 
             lock (waitLock)
             {
                 Monitor.Pulse(waitLock);
             }
+        }
+
+        public void KeyUp(System.Windows.Forms.Keys key)
+        {
+            downKeys.Remove(key);
+        }
+
+        public bool IsKeyDown(System.Windows.Forms.Keys key)
+        {
+            return downKeys.Contains(key);
         }
 
         public bool KeyPressAvailable => buffer.Any();

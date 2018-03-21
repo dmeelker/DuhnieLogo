@@ -18,5 +18,10 @@ namespace DuhnieLogo.Core.Interpreter
         {
             Token = token;
         }
+
+        public ScriptException(string message, Token token, Exception innerException) : base(message,innerException)
+        {
+            Token = token;
+        }
     }
 }

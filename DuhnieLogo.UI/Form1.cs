@@ -201,10 +201,15 @@ namespace DuhnieLogo.UI
                 }
                 catch (ScriptException ex)
                 {
-                    if (ex.Token != null)
-                        WriteToConsole($"Er is een fout opgetreden: {ex.Message} (Regel: {ex.Token.Location.Row + 1}, Teken: {ex.Token.Location.Column + 1})");
-                    else
-                        WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
+                    WriteToConsole($"Er is een fout opgetreden: {FormatScriptExceptionMessage(ex)}");
+
+                    if (ex.InnerException != null)
+                    {
+                        if(ex.InnerException is ScriptException)
+                            WriteToConsole($" {FormatScriptExceptionMessage(ex.InnerException as ScriptException)}");
+                        else
+                            WriteToConsole($" {ex.Message}");
+                    }
                 }
                 catch(ExcecutionStoppedException)
                 {
@@ -215,6 +220,14 @@ namespace DuhnieLogo.UI
                     WriteToConsole($"Er is een fout opgetreden: {ex.Message}");
                 }
             }
+        }
+
+        private string FormatScriptExceptionMessage(ScriptException ex)
+        {
+            if (ex.Token != null)
+                return $"{ex.Message} (Regel: {ex.Token.Location.Row + 1}, Teken: {ex.Token.Location.Column + 1})";
+            else
+                return ex.Message;
         }
 
         private void EnableRunningMode()
@@ -477,6 +490,12 @@ namespace DuhnieLogo.UI
                 var key = inputProvider.WaitForKeyPress();
                 return (int) key;
             });
+
+            interpreter.RegisterFunction("toetsingedrukt", new string[] { "code" }, (_context, _arguments) =>
+            {
+                var keyCode = Convert.ToInt32(_arguments[0]);
+                return inputProvider.IsKeyDown((Keys) keyCode);
+            });
         }
 
         private void ClearConsole()
@@ -510,6 +529,11 @@ namespace DuhnieLogo.UI
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             inputProvider.KeyDown(e.KeyCode);
+        }
+
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            inputProvider.KeyUp(e.KeyCode);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -606,5 +630,7 @@ namespace DuhnieLogo.UI
         {
             interpreter.Stop();
         }
+
+        
     }
 }

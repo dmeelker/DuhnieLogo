@@ -18,13 +18,12 @@ leer Opbouwen
 eind
 
 leer Frame
- Test Toets?
- Alswaar [LeesInput]
+ LeesInput
 
  BoefLoop
  Botsingen
 
- Wacht 10
+ Wacht 20
 eind
 
 leer BoefLoop
@@ -47,17 +46,12 @@ leer Botsing
 eind
 
 leer LeesInput
- lokaal "knop
- maak "knop leestoets
-
- als :knop = 27 [maak "stoppen welwaar] []
+ als toetsingedrukt 27 [maak "stoppen welwaar] []
  
- als :knop = 38 [vooruit 10] []
- als :knop = 40 [achteruit 10] []
- als :knop = 37 [links 10] []
- als :knop = 39 [rechts 10] []
-
- ; print :knop
+ als toetsingedrukt 38 [vooruit 2] []
+ als toetsingedrukt 40 [achteruit 2] []
+ als toetsingedrukt 37 [links 5] []
+ als toetsingedrukt 39 [rechts 5] []
 eind
 
 Main
