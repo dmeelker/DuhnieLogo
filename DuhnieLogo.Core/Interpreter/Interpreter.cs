@@ -164,7 +164,31 @@ namespace DuhnieLogo.Core.Interpreter
                 return Image.FromFile(fileName);
             });
 
-            RegisterFunction("plaatserachter", new string[] { "element", "toevoegsel" }, (_context, _arguments) => {
+            RegisterFunction("aantal", new string[] { "aanduiding" }, (_context, _arguments) => {
+                var target = _arguments[0];
+
+                if (target is ListVariable)
+                    return (target as ListVariable).Count;
+                else
+                    throw new ScriptException($"Aantal verwacht een lijst", _context.CallToken);
+            });
+
+            RegisterFunction("plaatservoor", new string[] { "aanduiding", "lijst" }, (_context, _arguments) => {
+                var target = _arguments[1];
+                var addition = _arguments[0];
+
+                if (target is ListVariable)
+                {
+                    var newList = new ListVariable((target as ListVariable));
+
+                    newList.Insert(0, addition.ToString());
+                    return newList;
+                }
+                else
+                    throw new ScriptException($"Plaatservoor verwacht een aanduiding en een lijst", _context.CallToken);
+            });
+
+            RegisterFunction("plaatserachter", new string[] { "aanduiding", "lijst" }, (_context, _arguments) => {
                 var target = _arguments[1];
                 var addition = _arguments[0];
 
@@ -175,8 +199,66 @@ namespace DuhnieLogo.Core.Interpreter
                     newList.Add(addition.ToString());
                     return newList;
                 }
+                else
+                    throw new ScriptException($"Plaatserachter verwacht een aanduiding en een lijst", _context.CallToken);
+            });
 
-                return null;
+            RegisterFunction("eerste", new string[] { "aanduiding" }, (_context, _arguments) => {
+                var target = _arguments[0];
+
+                if (target is ListVariable)
+                {
+                    var list = target as ListVariable;
+                    if (list.Count == 0)
+                        throw new ScriptException($"Ik kan niet het eerste element van een lege lijst opvragen", _context.CallToken);
+                    
+                    return list[0];
+                }
+                else
+                    throw new ScriptException($"Eerste verwacht een lijst", _context.CallToken);
+            });
+
+            RegisterFunction("laatste", new string[] { "aanduiding" }, (_context, _arguments) => {
+                var target = _arguments[0];
+
+                if (target is ListVariable)
+                {
+                    var list = target as ListVariable;
+                    if (list.Count == 0)
+                        throw new ScriptException($"Ik kan niet het laatste element van een lege lijst opvragen", _context.CallToken);
+
+                    return list[list.Count - 1];
+                }
+                else
+                    throw new ScriptException($"Laatste verwacht een lijst", _context.CallToken);
+            });
+
+            RegisterFunction("mineerste", new string[] { "lijst" }, (_context, _arguments) => {
+                var list = _arguments[0];
+
+                if (list is ListVariable)
+                {
+                    var newList = new ListVariable((list as ListVariable));
+
+                    newList.RemoveAt(0);
+                    return newList;
+                }
+                else
+                    throw new ScriptException($"Mineerste verwacht een lijst", _context.CallToken);
+            });
+
+            RegisterFunction("minlaatste", new string[] { "lijst" }, (_context, _arguments) => {
+                var list = _arguments[0];
+
+                if (list is ListVariable)
+                {
+                    var newList = new ListVariable((list as ListVariable));
+
+                    newList.RemoveAt(newList.Count - 1);
+                    return newList;
+                }
+                else
+                    throw new ScriptException($"Minlaatste verwacht een lijst", _context.CallToken);
             });
 
             RegisterFunction("element", new string[] { "welke", "aanduiding" }, (_context, _arguments) => {
